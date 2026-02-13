@@ -4,7 +4,7 @@ import { useTemplateRef } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/starter-kit/button';
 import {
     Dialog,
     DialogClose,
@@ -14,9 +14,9 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/starter-kit/dialog';
+import { Input } from '@/components/starter-kit/input';
+import { Label } from '@/components/starter-kit/label';
 
 const passwordInput = useTemplateRef('passwordInput');
 </script>

@@ -2,11 +2,11 @@
 import { Form, Head } from '@inertiajs/vue3';
 import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
 import { onUnmounted, ref } from 'vue';
-import Heading from '@/components/Heading.vue';
-import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue';
-import TwoFactorSetupModal from '@/components/TwoFactorSetupModal.vue';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import Heading from '@/components/starter-kit/Heading.vue';
+import TwoFactorRecoveryCodes from '@/components/starter-kit/TwoFactorRecoveryCodes.vue';
+import TwoFactorSetupModal from '@/components/starter-kit/TwoFactorSetupModal.vue';
+import { Badge } from '@/components/starter-kit/ui/badge';
+import { Button } from '@/components/starter-kit/ui/button';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import InputError from '@/components/starter-kit/InputError.vue';
+import { Button } from '@/components/starter-kit/ui/button';
+import { Input } from '@/components/starter-kit/ui/input';
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
-} from '@/components/ui/input-otp';
+} from '@/components/starter-kit/ui/input-otp';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { store } from '@/routes/two-factor/login';
 import type { TwoFactorConfigContent } from '@/types';

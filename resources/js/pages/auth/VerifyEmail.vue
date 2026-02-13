@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import TextLink from '@/components/starter-kit/TextLink.vue';
+import { Button } from '@/components/starter-kit/ui/button';
+import { Spinner } from '@/components/starter-kit/ui/spinner';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';

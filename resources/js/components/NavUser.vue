@@ -5,18 +5,18 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/starter-kit/dropdown-menu';
 import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from '@/components/ui/sidebar';
+} from '@/components/starter-kit/sidebar';
 import UserInfo from '@/components/UserInfo.vue';
 import UserMenuContent from './UserMenuContent.vue';
 
 const page = usePage();
-const user = page.props.auth.user;
+const user = page.props.auth.user || { name: 'Fallback Value' };
 const { isMobile, state } = useSidebar();
 </script>
 

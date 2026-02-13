@@ -5,20 +5,20 @@ import { Check, Copy, ScanLine } from 'lucide-vue-next';
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import AlertError from '@/components/AlertError.vue';
 import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/starter-kit/button';
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/starter-kit/dialog';
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
-} from '@/components/ui/input-otp';
-import { Spinner } from '@/components/ui/spinner';
+} from '@/components/starter-kit/input-otp';
+import { Spinner } from '@/components/starter-kit/spinner';
 import { useAppearance } from '@/composables/useAppearance';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { confirm } from '@/routes/two-factor';
