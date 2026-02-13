@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import UserMenuContent from '@components/starter-kit/UserMenuContent.vue';
 import { usePage } from '@inertiajs/vue3';
 import { ChevronsUpDown } from 'lucide-vue-next';
 import {
@@ -14,6 +13,7 @@ import {
     useSidebar,
 } from '@/components/starter-kit/ui/sidebar';
 import UserInfo from '@/components/starter-kit/UserInfo.vue';
+import UserMenuContent from '@/components/starter-kit/UserMenuContent.vue';
 
 const page = usePage();
 const user = page.props.auth.user || { name: 'Fallback Value' };
