@@ -15,13 +15,14 @@
  */
 
 import { defineComponent, h, ref, type Component } from 'vue';
-import Eligibility from './Eligibility.vue';
+import PersonalDetails from './PersonalDetails.vue';
+// import EligibilityChecks from './EligibilityChecks.vue';
 
 export interface FormStep {
     id: string; // iteration key: must be unique
     title: string;
     component: Component;
-    props?: { [key: string]: any };
+    props?: Record<string, unknown>;
 }
 
 const PlaceholderStep = defineComponent({
@@ -41,14 +42,19 @@ const PlaceholderStep = defineComponent({
 // A Step can currently be accessed using the array index & `step` state
 // A Map could potentially be better than an array - can be accessed by the name of the step if necessary - may also be a premature optimisation
 const formSteps: FormStep[] = [
-    {
-        id: 'eligibility',
-        title: 'Eligibility Checks',
-        component: Eligibility,
-    },
+    // {
+    //     id: 'eligibility',
+    //     title: 'Eligibility Checks',
+    //     component: EligibilityChecks,
+    // },
     {
         id: 'personal-details',
         title: 'Personal Details',
+        component: PersonalDetails,
+    },
+    {
+        id: 'placeholder',
+        title: 'Placeholder',
         component: PlaceholderStep,
     },
 ];

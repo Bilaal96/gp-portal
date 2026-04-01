@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useForm } from '@tanstack/vue-form';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import { Button } from '../ui/button';
 
 /**
@@ -35,6 +34,7 @@ import { Button } from '../ui/button';
  */
 
 import formSteps from './form-steps';
+import { createPatientRegistrationForm } from './formFactory';
 
 const stepIndex = ref(0);
 const step = computed(() => formSteps[stepIndex.value]);
@@ -54,10 +54,12 @@ watchEffect(() => console.log({ stepIndex, step: step.value.id }));
  */
 
 // TODO: pass custom types for each step to useForm<>
+// ! NOT POSSIBLE TO PASS CUSTOM TYPES PER FORM INSTANCE
 // ? If a value is marked as dependency: the preceding input value determines if it renders or not.
-const form = useForm({
+
+/* const form = useForm({
     defaultValues: {
-        eligibility: {
+        proxyRegistrationGuard: {
             // TODO: proxy-registration
             // radio: yourself | (2) child | (3) someone you care for
             // ! Affects conditional rendering of subsequent form inputs
@@ -67,11 +69,6 @@ const form = useForm({
             // false: not eligible - must be existing patient to apply on behalf of someone else
             // true: request user login before proceeding to proxy-registration form (should have additional step to verify identity)
             existingPatient: false,
-
-            // Optional, radio: yes / no | true / false
-            ukResidencyConfirmation: false,
-            // checkbox
-            acknowledgedApplicationProcessDuration: false,
         },
         personal: {
             firstName: '',
@@ -90,9 +87,16 @@ const form = useForm({
 
             // radio: (include "prefer not to say" option)
             genderIdentity: '',
+
+            // Optional, radio: yes / no | true / false
+            ukResidencyConfirmation: false,
+            // checkbox
+            acknowledgedApplicationProcessDuration: false,
         },
     },
-});
+}); */
+
+const form = createPatientRegistrationForm();
 
 function prevStep() {
     stepIndex.value = stepIndex.value - 1;
@@ -101,6 +105,13 @@ function prevStep() {
 function nextStep() {
     stepIndex.value = stepIndex.value + 1;
 }
+
+watch(
+    () => form.state.values,
+    () => {
+        console.log({ form: form.state.values });
+    },
+);
 </script>
 
 <template>
@@ -115,7 +126,7 @@ function nextStep() {
         -->
         <component :is="step.component" v-bind="step.props" :form="form" />
 
-        <div class="flex">
+        <div class="mt-6 flex">
             <Button
                 v-if="stepIndex - 1 !== -1"
                 class="cursor-pointer bg-foreground hover:bg-foreground/90"
