@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { Button } from '../ui/button';
 
 /**
@@ -34,7 +34,7 @@ import { Button } from '../ui/button';
  */
 
 import formSteps from './form-steps';
-import { createPatientRegistrationForm } from './formFactory';
+import { createPatientRegistrationForm } from './form';
 
 const stepIndex = ref(0);
 const step = computed(() => formSteps[stepIndex.value]);
@@ -105,13 +105,6 @@ function prevStep() {
 function nextStep() {
     stepIndex.value = stepIndex.value + 1;
 }
-
-watch(
-    () => form.state.values,
-    () => {
-        console.log({ form: form.state.values });
-    },
-);
 </script>
 
 <template>
@@ -120,25 +113,32 @@ watch(
             Step: {{ stepIndex + 1 }} / {{ formSteps.length }}
         </p>
 
-        <!-- 
+        <form @submit="form.handleSubmit()">
+            <!-- 
             - Can pass additional props - they will merge 
             - Order matters - later props will override earlier ones with same name
         -->
-        <component :is="step.component" v-bind="step.props" :form="form" />
+            <component :is="step.component" v-bind="step.props" :form="form" />
 
-        <div class="mt-6 flex">
-            <Button
-                v-if="stepIndex - 1 !== -1"
-                class="cursor-pointer bg-foreground hover:bg-foreground/90"
-                @click="prevStep()"
-                >Back</Button
-            >
-            <Button
-                v-if="stepIndex + 1 !== formSteps.length"
-                class="ml-auto cursor-pointer"
-                @click="nextStep()"
-                >Next</Button
-            >
-        </div>
+            <div class="mt-6 flex">
+                <Button
+                    v-if="stepIndex - 1 !== -1"
+                    class="cursor-pointer bg-foreground hover:bg-foreground/90"
+                    @click="prevStep()"
+                    >Back</Button
+                >
+                <Button
+                    v-if="stepIndex + 1 !== formSteps.length"
+                    class="ml-auto cursor-pointer"
+                    @click="
+                        () => {
+                            nextStep();
+                            console.log({ form: form.state.values });
+                        }
+                    "
+                    >Next</Button
+                >
+            </div>
+        </form>
     </div>
 </template>

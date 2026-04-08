@@ -11,7 +11,7 @@
     - using field.handleChange() to sync the input element with tanstack form state
  */
 
-import { watchEffect, type HTMLAttributes } from 'vue';
+import { type HTMLAttributes } from 'vue';
 
 import { cn } from '@/lib/utils';
 import Label from '../ui/label/Label.vue';
@@ -21,14 +21,9 @@ const props = defineProps<{
     class?: HTMLAttributes['class'];
     label?: string;
     id: string;
-    field: FieldProps;
+    field: FieldProps<string | number>;
 }>();
 defineEmits(['input']);
-
-// For debugging: logs input value
-watchEffect(() => {
-    console.log({ [props.field.name]: props.field.state.value });
-});
 </script>
 
 <template>
@@ -46,9 +41,25 @@ watchEffect(() => {
             :value="props.field.state.value"
             @input="
                 (e: Event) => {
-                    props.field.handleChange(
-                        (e.target as HTMLInputElement).value,
+                    console.log(
+                        `valueAsNumber ${props.field.name}:`,
+                        (e.target as HTMLInputElement).valueAsNumber,
                     );
+
+                    props.field.handleChange(
+                        (e.target as HTMLInputElement).valueAsNumber,
+                    );
+
+                    // ? Alternatively:
+                    /* props.field.form.setFieldValue(
+                        props.field.name,
+                        (e.target as HTMLInputElement).value,
+                    ); */
+
+                    // For Debugging: (non-reactive) reads directly from form state
+                    console.log({
+                        [props.field.name]: props.field.state.value,
+                    });
 
                     // Execute side effects on input change
                     $emit('input', e);

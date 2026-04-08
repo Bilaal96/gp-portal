@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import { watch } from 'vue';
+import DateOfBirthInput from '@/components/tanstack-form/DateOfBirthInput.vue';
 import Input from '@/components/tanstack-form/Input.vue';
 import Separator from '@/components/ui/separator/Separator.vue';
-import { type PatientRegistrationForm } from '../formFactory';
+import { type PatientRegistrationForm } from '../form';
 
-defineProps<{ form: PatientRegistrationForm }>();
+const props = defineProps<{ form: PatientRegistrationForm }>();
+
+// Reactive state logging for debugging tanstack form input syncing
+const personal = props.form.useStore((state) => state.values.personal);
+watch(personal, (state) =>
+    console.log('Personal Details', JSON.parse(JSON.stringify(state))),
+);
 </script>
 
 <template>
@@ -53,30 +61,36 @@ defineProps<{ form: PatientRegistrationForm }>();
                     </template>
                 </form.Field>
             </div>
+
+            <!-- Previous Name(s) -->
+            <form.Field name="personal.previousNames">
+                <template v-slot="{ field }">
+                    <Input
+                        class="max-w-sm"
+                        label="Previous Name(s)"
+                        id="previous-names"
+                        :field
+                    />
+                </template>
+            </form.Field>
+
+            <Separator class="my-2" />
+
+            <!-- Date of Birth - restrict to any past date -->
+            <form.Field name="personal.dateOfBirth">
+                <template v-slot="{ field }">
+                    <DateOfBirthInput id-prefix="applicant" :field />
+                </template>
+            </form.Field>
+
+            <!-- Sex Registered at Birth -->
+            <!-- Gender Identity -->
+            <!-- Are you pregnant (conditionally rendered
+                - dependent on sex at birth) 
+            -->
+            <!-- Have you lived in the UK for more than 3 Months? -->
+            <!-- Approval of your registration application may take up to 14 days. Please check the box to confirm that you understand. -->
         </div>
-        <Separator class="my-2" />
-
-        <!-- Previous Name(s) -->
-        <form.Field name="personal.previousNames">
-            <template v-slot="{ field }">
-                <Input
-                    class="max-w-sm"
-                    label="Previous Name(s)"
-                    id="previous-names"
-                    :field
-                />
-            </template>
-        </form.Field>
-
-        <!-- Date of Birth - date picker - restrict to any past date -->
-
-        <!-- Sex Registered at Birth -->
-        <!-- Gender Identity -->
-        <!-- Are you pregnant (conditionally rendered
-            - dependent on sex at birth) 
-        -->
-        <!-- Have you lived in the UK for more than 3 Months? -->
-        <!-- Approval of your registration application may take up to 14 days. Please check the box to confirm that you understand. -->
 
         <!-- End: All Questions -->
     </div>

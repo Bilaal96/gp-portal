@@ -1,5 +1,11 @@
 import { useForm } from '@tanstack/vue-form';
 
+export interface DateOfBirth<T = number | null> {
+    day: T;
+    month: T;
+    year: T;
+}
+
 export const defaultValues = {
     proxyRegistrationGuard: {
         // TODO: proxy-registration
@@ -18,8 +24,12 @@ export const defaultValues = {
         lastName: '',
         previousNames: '', // optional
 
-        // date: with calendar selection
-        dateOfBirth: '',
+        // date of birth - custom input
+        dateOfBirth: {
+            day: null,
+            month: null,
+            year: null,
+        } as DateOfBirth,
 
         // radio: male | female
         sexAtBirth: 'male',
