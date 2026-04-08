@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { watch } from 'vue';
+import Input from '@/components/Input.vue';
 import DateOfBirthInput from '@/components/tanstack-form/DateOfBirthInput.vue';
-import Input from '@/components/tanstack-form/Input.vue';
+import type { TanstackField } from '@/components/tanstack-form/types';
 import Separator from '@/components/ui/separator/Separator.vue';
 import { type PatientRegistrationForm } from '../form';
 
@@ -12,6 +13,15 @@ const personal = props.form.useStore((state) => state.values.personal);
 watch(personal, (state) =>
     console.log('Personal Details', JSON.parse(JSON.stringify(state))),
 );
+
+function getTextFieldProps(field: TanstackField) {
+    return {
+        name: field.name,
+        value: field.state.value,
+        onInput: (e: Event) =>
+            field.handleChange((e.target as HTMLInputElement).value),
+    };
+}
 </script>
 
 <template>
@@ -34,7 +44,7 @@ watch(personal, (state) =>
                             class="max-w-sm"
                             label="First Name"
                             id="first-name"
-                            :field
+                            v-bind="getTextFieldProps(field)"
                         />
                     </template>
                 </form.Field>
@@ -45,7 +55,7 @@ watch(personal, (state) =>
                             class="max-w-sm"
                             label="Middle Name(s)"
                             id="middle-names"
-                            :field
+                            v-bind="getTextFieldProps(field)"
                         />
                     </template>
                 </form.Field>
@@ -56,20 +66,19 @@ watch(personal, (state) =>
                             class="max-w-sm"
                             label="Last Name"
                             id="last-name"
-                            :field
+                            v-bind="getTextFieldProps(field)"
                         />
                     </template>
                 </form.Field>
             </div>
 
-            <!-- Previous Name(s) -->
             <form.Field name="personal.previousNames">
                 <template v-slot="{ field }">
                     <Input
                         class="max-w-sm"
                         label="Previous Name(s)"
                         id="previous-names"
-                        :field
+                        v-bind="getTextFieldProps(field)"
                     />
                 </template>
             </form.Field>

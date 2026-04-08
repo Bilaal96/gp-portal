@@ -11,11 +11,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '../ui/select';
-import type { FieldProps } from './types';
+import type { TanstackField } from './types';
 
 const props = defineProps<{
     idPrefix?: string;
-    field: FieldProps<DateOfBirth>;
+    field: TanstackField<DateOfBirth>;
     required?: boolean;
 }>();
 
@@ -122,7 +122,6 @@ const MONTHS = [
             - age restrictions?
     -->
 
-    <!-- <fieldset class="flex flex-col gap-4 md:flex-row"> -->
     <fieldset>
         <legend class="mb-1 ml-1 text-sm font-bold">Date of Birth</legend>
 
@@ -130,7 +129,6 @@ const MONTHS = [
             e.g. January 15 1987
         </p>
 
-        <!-- <div class="flex flex-col gap-2 md:flex-row"> -->
         <div class="flex gap-2">
             <Select
                 :name="`${props.field.name}.month`"

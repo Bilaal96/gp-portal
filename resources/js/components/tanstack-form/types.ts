@@ -1,31 +1,23 @@
 import { useForm } from '@tanstack/vue-form';
 
 /**
- * Used to type form.field prop received by tanstack-form/Input.vue
- * The component just needs to be aware of explicitly used members.
+ * `TanstackField` simply defines any members of `FieldApi` that you may explicitly access on `form.field`.
+ * It's essentially a simple replacement for `FieldApi` type (which is difficult to infer from).
+ * Used to type `form.field` prop received by custom inputs that are tightly coupled to tanstack form - see `@/components/tanstack-form`
  */
 
-export interface FieldProps<TState = string> {
-    name: string;
-    state: { value: TState };
-    handleChange: (value: any) => void;
-    form: {
-        getFieldValue: (field: any) => any;
-        setFieldValue: (field: any, value: any) => void;
-    };
-}
-/* 
-export interface FieldProps<
-    TState = string,
-    TFieldValue = TState extends object ? keyof TState : TState,
-> {
+export interface TanstackField<TState = string> {
     name: string;
     state: { value: TState };
     handleChange: (value: TState) => void;
     form: {
-        setFieldValue: (field: any, value: TFieldValue) => void;
+        // Using type `any` is intentional.
+        // Gets around library restrictions that cause annoying type errors that are near-impossible to resolve.
+        // Here specifically, FieldApi is specific to each form instance and infers inflexible/narrow types (for field names & values) from the options provided to useForm
+        getFieldValue: (field: any) => any;
+        setFieldValue: (field: any, value: any) => void;
     };
-} */
+}
 
 /* --------------------------------- Unused --------------------------------- */
 /**
