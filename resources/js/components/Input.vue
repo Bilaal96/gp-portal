@@ -27,9 +27,10 @@
  */
 
 import { computed, type InputHTMLAttributes } from 'vue';
-
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { Label } from './ui/label';
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps<
     InputHTMLAttributes & {
@@ -68,7 +69,7 @@ const inputProps = computed<InputHTMLAttributes>(() => {
         >
 
         <input
-            v-bind="inputProps"
+            v-bind="{ ...inputProps, ...$attrs }"
             @input="$emit('input', $event)"
             data-slot="input"
             :class="
