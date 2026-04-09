@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils';
-
-import type { DateOfBirth } from '../patient-registration/form';
+import { type InputHTMLAttributes } from 'vue';
+import Input from '@/components/Input.vue';
+import { type DateOfBirth } from '@/components/patient-registration/form';
+import type { TanstackField } from '@/components/tanstack-form/types';
 import {
     Select,
     SelectContent,
@@ -10,8 +11,8 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from '../ui/select';
-import type { TanstackField } from './types';
+} from '@/components/ui/select';
+import { capitalize, cn } from '@/lib/utils';
 
 const props = defineProps<{
     idPrefix?: string;
@@ -19,20 +20,50 @@ const props = defineProps<{
     required?: boolean;
 }>();
 
-const baseStyles = cn(
-    'h-9 w-full min-w-max rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30',
-    'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-    'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
-    'w-24',
-);
-
+/**
+ * Prefixes `props.idPrefix` to a given `key`.
+ * Used to make value of HTML `id` attribute unique.
+ */
 function getInputId(key: 'day' | 'month' | 'year') {
     const prefix = props.idPrefix ? props.idPrefix + '-' : '';
     return prefix + 'dob-' + key;
 }
 
 /**
- * Synchronises day & year inputs with the corresponding tanstack form state.
+ * Dynamically defines props shared between `day` & `year` inputs.
+ * Updates to shared props of these inputs can be made in one place.
+ */
+function getInputProps(
+    key: 'day' | 'year',
+    type: 'text' | 'number' = 'number',
+) {
+    type DataAttributes = Record<`data-${string}`, string>;
+    type InputProps = InputHTMLAttributes & DataAttributes;
+
+    const capitalizedKey = capitalize(key);
+    let inputProps: InputProps = {
+        type,
+        'aria-label': capitalizedKey,
+        placeholder: capitalizedKey,
+        id: getInputId(key),
+        class: cn('w-24'),
+        name: `${props.field.name}.${key}`,
+        value: `${props.field.state.value[key]}`,
+    };
+
+    if (type === 'text') {
+        inputProps = {
+            ...inputProps,
+            inputmode: 'numeric',
+            pattern: '[0-9]*',
+        };
+    }
+
+    return inputProps;
+}
+
+/**
+ * Synchronises `day` & `year` inputs with the corresponding tanstack form state.
  * Note that `dateOfBirth` state must conform to the `DateOfBirth` type.
  */
 function handleInput(key: 'day' | 'year', e: Event) {
@@ -53,6 +84,10 @@ function handleInput(key: 'day' | 'year', e: Event) {
     });
 }
 
+/**
+ * List of each month in a year.
+ * Used to list `Select` options for the `month` input.
+ */
 const MONTHS = [
     'January',
     'February',
@@ -147,7 +182,13 @@ const MONTHS = [
                 "
                 :required
             >
+                <!-- 
+                    This is a button rendered in the view.
+                    It's what the user interacts with.
+                    It toggles state to show/hide SelectContent.
+                -->
                 <SelectTrigger
+                    :id="getInputId('month')"
                     class="w-35 hover:cursor-pointer"
                     aria-label="Month"
                 >
@@ -182,13 +223,30 @@ const MONTHS = [
                 - if month selected, calculate days using selected month AND current year (accounts for leap year)
                 - if month AND year selected, calculate days using selected month AND selected year (accounts for leap year)
             -->
-            <input
+            <Input
+                v-bind="getInputProps('day')"
+                @input="handleInput('day', $event)"
+                min="1"
+                max="31"
+                maxlength="2"
+                :required
+            />
+            <Input
+                v-bind="getInputProps('year')"
+                @input="handleInput('year', $event)"
+                min="1900"
+                :max="new Date().getUTCFullYear()"
+                maxlength="4"
+                :required
+            />
+
+            <!-- Without getInputProps() -->
+            <!-- <Input
                 type="number"
-                data-slot="input"
-                :class="cn(baseStyles)"
-                :id="getInputId('day')"
+                :class="inputStyles"
                 aria-label="Day"
                 placeholder="Day"
+                :id="getInputId('day')"
                 :name="`${props.field.name}.day`"
                 :value="props.field.state.value.day"
                 @input="handleInput('day', $event)"
@@ -198,14 +256,12 @@ const MONTHS = [
                 :required
             />
 
-            <input
+            <Input
                 type="number"
-                inputmode="numeric"
-                data-slot="input"
-                :class="cn(baseStyles)"
-                :id="getInputId('year')"
                 aria-label="Year"
                 placeholder="Year"
+                :id="getInputId('year')"
+                :class="inputStyles"
                 :name="`${props.field.name}.year`"
                 :value="props.field.state.value.year"
                 @input="handleInput('year', $event)"
@@ -213,54 +269,7 @@ const MONTHS = [
                 :max="new Date().getUTCFullYear()"
                 maxlength="4"
                 :required
-            />
+            /> -->
         </div>
     </fieldset>
-
-    <!-- <div class="flex flex-col gap-4 md:flex-row">
-        <div class="space-y-2">
-            <Label :for="getInputId('day')" class="ml-1 font-bold">Day</Label>
-            <input
-                type="number"
-                data-slot="input"
-                :class="cn(baseStyles)"
-                :id="getInputId('day')"
-                :name="`${props.field.name}.day`"
-                :value="props.field.state.value.day"
-                @input="handleInput('day', $event)"
-                min="1"
-                max="31"
-            />
-        </div>
-
-        <div class="space-y-2">
-            <Label :for="getInputId('month')" class="ml-1 font-bold">Month</Label>
-            <input
-                type="number"
-                data-slot="input"
-                :class="cn(baseStyles)"
-                :id="getInputId('month')"
-                :name="`${props.field.name}.month`"
-                :value="props.field.state.value.month"
-                @input="handleInput('month', $event)"
-                min="1"
-                max="12"
-            />
-        </div>
-
-        <div class="space-y-2">
-            <Label :for="getInputId('year')" class="ml-1 font-bold">Year</Label>
-            <input
-                type="number"
-                data-slot="input"
-                :class="cn(baseStyles)"
-                :id="getInputId('year')"
-                :name="`${props.field.name}.year`"
-                :value="props.field.state.value.year"
-                @input="handleInput('year', $event)"
-                min="1900"
-                :max="new Date().getUTCFullYear()"
-            />
-        </div> 
-    </div> -->
 </template>
