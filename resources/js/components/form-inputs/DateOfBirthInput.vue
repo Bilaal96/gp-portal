@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type InputHTMLAttributes } from 'vue';
-import Input from '@/components/form-inputs/Input.vue';
+import { Input } from '@/components/form-inputs';
 import type { TanstackField } from '@/components/form-inputs/types';
 import { type DateOfBirth } from '@/components/patient-registration/form';
 import {
