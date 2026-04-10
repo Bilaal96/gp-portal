@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 import { DateOfBirthInput, Input, RadioGroup } from '@/components/form-inputs';
+import {
+    binaryRadioGroup,
+    createRadioGroupOptions,
+} from '@/components/form-inputs/radio-group/utils';
 import type { TanstackField } from '@/components/form-inputs/types';
 import { Label } from '@/components/ui/label';
 import Separator from '@/components/ui/separator/Separator.vue';
@@ -111,25 +115,19 @@ watch(personal, (state) =>
                 <RadioGroup
                     id="gender-identity-radio-group"
                     prompt="What is your gender identity"
-                    :options="[
-                        { id: 'man', label: 'Man', value: 'man' },
-                        { id: 'woman', label: 'Woman', value: 'woman' },
-                        {
-                            id: 'non-binary',
-                            label: 'Non-binary',
-                            value: 'non-binary',
-                        },
-                        {
-                            id: 'other',
-                            label: 'Other',
-                            value: 'other',
-                        },
-                        {
-                            id: 'undisclosed',
-                            label: 'Prefer not to say',
-                            value: 'undisclosed',
-                        },
-                    ]"
+                    :options="
+                        createRadioGroupOptions([
+                            'man',
+                            'woman',
+                            'non-binary',
+                            'other',
+                            {
+                                id: 'undisclosed',
+                                label: 'Prefer not to say',
+                                value: 'undisclosed',
+                            },
+                        ])
+                    "
                     @change="(value) => field.handleChange(value)"
                 />
             </form.Field>
@@ -160,15 +158,17 @@ watch(personal, (state) =>
                 <RadioGroup
                     id="sex-at-birth"
                     prompt="Sex registered at birth:"
-                    :options="[
-                        { id: 'male', label: 'Male', value: 'male' },
-                        { id: 'female', label: 'Female', value: 'female' },
-                        {
-                            id: 'undisclosed',
-                            label: 'Prefer not to say',
-                            value: 'undisclosed',
-                        },
-                    ]"
+                    :options="
+                        createRadioGroupOptions([
+                            'male',
+                            'female',
+                            {
+                                id: 'undisclosed',
+                                label: 'Prefer not to say',
+                                value: 'undisclosed',
+                            },
+                        ])
+                    "
                     @change="(value) => field.handleChange(value)"
                 />
             </form.Field>
@@ -184,10 +184,7 @@ watch(personal, (state) =>
                 <RadioGroup
                     id="is-pregnant"
                     prompt="Are you pregnant?"
-                    :options="[
-                        { id: 'yes', label: 'Yes', value: 'yes' },
-                        { id: 'no', label: 'No', value: 'no' },
-                    ]"
+                    :options="binaryRadioGroup()"
                     @change="
                         (value) =>
                             field.handleChange(value === 'yes' ? true : false)
@@ -203,10 +200,7 @@ watch(personal, (state) =>
                 <RadioGroup
                     id="uk-residency-confirmation"
                     prompt="Have you lived in the UK for more than 3 Months?"
-                    :options="[
-                        { id: 'yes', label: 'Yes', value: 'yes' },
-                        { id: 'no', label: 'No', value: 'no' },
-                    ]"
+                    :options="binaryRadioGroup()"
                     @change="(value) => field.handleChange(value)"
                 />
             </form.Field>
