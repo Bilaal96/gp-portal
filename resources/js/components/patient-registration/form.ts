@@ -6,6 +6,14 @@ export interface DateOfBirth<T = number | null> {
     year: T;
 }
 
+interface FormTypes {
+    dateOfBirth: DateOfBirth;
+    sexAtBirth: 'male' | 'female' | 'undisclosed';
+    isPregnant?: boolean;
+    genderIdentity: 'male' | 'female' | 'non-binary' | 'other' | 'undisclosed';
+}
+
+// ? If a value is marked as dependency: the preceding input value determines if it renders or not.
 export const defaultValues = {
     proxyRegistrationGuard: {
         // TODO: proxy-registration
@@ -29,16 +37,18 @@ export const defaultValues = {
             day: null,
             month: null,
             year: null,
-        } as DateOfBirth,
+        } as FormTypes['dateOfBirth'],
 
-        // radio: male | female
-        sexAtBirth: 'male',
+        // radio
+        sexAtBirth: '' as FormTypes['sexAtBirth'],
         // ? dependency
-        // radio: // yes | no | unsure
-        isPregnant: '',
+        // radio: // yes | no
+        isPregnant: undefined as FormTypes['isPregnant'],
 
-        // radio: (include "prefer not to say" option)
-        genderIdentity: '',
+        // radio - (include "prefer not to say" option)
+        genderIdentity: '' as FormTypes['genderIdentity'],
+        // input:text - user may specify another gender identity
+        genderIdentityOther: '',
 
         // Optional, radio: yes / no | true / false
         ukResidencyConfirmation: false,
