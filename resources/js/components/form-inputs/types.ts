@@ -5,7 +5,6 @@ import { useForm } from '@tanstack/vue-form';
  * It's essentially a simple replacement for `FieldApi` type (which is difficult to infer from).
  * Used to type `form.field` prop received by custom inputs that are tightly coupled to tanstack form - see `@/components/tanstack-form`
  */
-
 export interface TanstackField<TState = string> {
     name: string;
     state: { value: TState };

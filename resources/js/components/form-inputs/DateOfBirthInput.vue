@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { type InputHTMLAttributes } from 'vue';
-import Input from '@/components/Input.vue';
+import Input from '@/components/form-inputs/Input.vue';
+import type { TanstackField } from '@/components/form-inputs/types';
 import { type DateOfBirth } from '@/components/patient-registration/form';
-import type { TanstackField } from '@/components/tanstack-form/types';
 import {
     Select,
     SelectContent,

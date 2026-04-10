@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import type { RadioGroupOption } from '@/components/tanstack-form/types';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+interface RadioGroupOption {
+    id: string;
+    label: string;
+    value: string;
+}
 
 const props = withDefaults(
     defineProps<{

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { watch } from 'vue';
-import Input from '@/components/Input.vue';
-import RadioGroup from '@/components/RadioGroup.vue';
-import DateOfBirthInput from '@/components/tanstack-form/DateOfBirthInput.vue';
-import type { TanstackField } from '@/components/tanstack-form/types';
+import DateOfBirthInput from '@/components/form-inputs/DateOfBirthInput.vue';
+import Input from '@/components/form-inputs/Input.vue';
+import RadioGroup from '@/components/form-inputs/RadioGroup.vue';
+import type { TanstackField } from '@/components/form-inputs/types';
 import { Label } from '@/components/ui/label';
 import Separator from '@/components/ui/separator/Separator.vue';
 import { type PatientRegistrationForm } from '../form';
