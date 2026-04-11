@@ -5,9 +5,7 @@ import SideNavigation from '@/components/patient-registration/SideNavigation.vue
 
 <template>
     <!-- Layout Grid -->
-    <div
-        class="grid h-screen grid-rows-[3rem_minmax(0,1fr)] bg-background text-foreground"
-    >
+    <div class="grid min-w-min grid-rows-[3rem_minmax(0,1fr)]">
         <!-- Header - Logo & Navigation -->
         <Header />
 
