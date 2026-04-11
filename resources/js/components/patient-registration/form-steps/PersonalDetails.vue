@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { watch } from 'vue';
-import { DateOfBirthInput, Input, RadioGroup } from '@/components/form-inputs';
+import {
+    Checkbox,
+    DateOfBirthInput,
+    Input,
+    RadioGroup,
+} from '@/components/form-inputs';
 import {
     binaryRadioGroup,
     createRadioGroupOptions,
@@ -192,6 +197,8 @@ watch(personal, (state) =>
                 />
             </form.Field>
 
+            <Separator class="my-2" />
+
             <!-- Have you lived in the UK for more than 3 Months? -->
             <form.Field
                 name="personal.meetsUkResidencyDuration"
@@ -209,6 +216,25 @@ watch(personal, (state) =>
             </form.Field>
 
             <!-- Approval of your registration application may take up to 14 days. Please check the box to confirm that you understand. -->
+
+            <form.Field
+                name="personal.acknowledgedApplicationProcessDuration"
+                v-slot="{ field }"
+            >
+                <!-- REVIEW: 
+                    - could extract to CheckboxGroup 
+                    - include prompt & option to render multiple checkboxes (akin to form-inputs/RadioGroup.vue) 
+                -->
+                <p class="mb-2 ml-1 text-sm font-bold">
+                    Please check the box below to confirm that you understand.
+                </p>
+                <Checkbox
+                    class="ml-2"
+                    id="application-duration-acknowledgement"
+                    label="Approval of your application to register may take up to 14 days."
+                    @change="(value) => field.handleChange(value)"
+                />
+            </form.Field>
         </div>
 
         <!-- End: All Questions -->
