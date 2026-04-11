@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { type InputHTMLAttributes } from 'vue';
 import { Input } from '@/components/form-inputs';
-import type { TanstackField } from '@/components/form-inputs/types';
 import { type DateOfBirth } from '@/components/patient-registration/form';
 import {
     Select,
@@ -13,6 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { capitalize, cn } from '@/lib/utils';
+import type { TanstackField } from '@/types';
 
 const props = defineProps<{
     idPrefix?: string;

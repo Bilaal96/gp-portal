@@ -10,9 +10,9 @@ import {
     binaryRadioGroup,
     createRadioGroupOptions,
 } from '@/components/form-inputs/radio-group/utils';
-import type { TanstackField } from '@/components/form-inputs/types';
 import { Label } from '@/components/ui/label';
 import Separator from '@/components/ui/separator/Separator.vue';
+import type { TanstackField } from '@/types';
 import { type PatientRegistrationForm } from '../form';
 
 const props = defineProps<{ form: PatientRegistrationForm }>();
