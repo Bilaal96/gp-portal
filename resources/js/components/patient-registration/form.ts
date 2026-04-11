@@ -11,6 +11,7 @@ interface FormTypes {
     sexAtBirth: 'male' | 'female' | 'undisclosed';
     isPregnant?: boolean;
     genderIdentity: 'male' | 'female' | 'non-binary' | 'other' | 'undisclosed';
+    meetsUkResidencyDuration?: boolean;
 }
 
 // ? If a value is marked as dependency: the preceding input value determines if it renders or not.
@@ -39,19 +40,22 @@ export const defaultValues = {
             year: null,
         } as FormTypes['dateOfBirth'],
 
-        // radio
+        // radio - (include "prefer not to say" option)
         sexAtBirth: '' as FormTypes['sexAtBirth'],
-        // ? dependency
-        // radio: // yes | no
+        // ? dependency: input shown if sexAtBirth === 'female'
+        // radio: boolean | undefined (unanswered)
         isPregnant: undefined as FormTypes['isPregnant'],
 
         // radio - (include "prefer not to say" option)
         genderIdentity: '' as FormTypes['genderIdentity'],
+        // ? dependency: input shown if genderIdentity === 'other'
         // input:text - user may specify another gender identity
         genderIdentityOther: '',
 
-        // Optional, radio: yes / no | true / false
-        ukResidencyConfirmation: false,
+        // Optional, radio: boolean | undefined (unanswered)
+        meetsUkResidencyDuration:
+            undefined as FormTypes['meetsUkResidencyDuration'],
+
         // checkbox
         acknowledgedApplicationProcessDuration: false,
     },

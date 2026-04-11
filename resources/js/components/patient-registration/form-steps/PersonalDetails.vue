@@ -194,14 +194,17 @@ watch(personal, (state) =>
 
             <!-- Have you lived in the UK for more than 3 Months? -->
             <form.Field
-                name="personal.ukResidencyConfirmation"
+                name="personal.meetsUkResidencyDuration"
                 v-slot="{ field }"
             >
                 <RadioGroup
                     id="uk-residency-confirmation"
                     prompt="Have you lived in the UK for more than 3 Months?"
                     :options="binaryRadioGroup()"
-                    @change="(value) => field.handleChange(value)"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
                 />
             </form.Field>
 
