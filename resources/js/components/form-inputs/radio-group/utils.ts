@@ -5,7 +5,11 @@ import RadioGroupOption from '@/components/form-inputs/radio-group/RadioGroupOpt
  */
 
 // ? Are these types shared with RadioGroupOption class? can they be reused?
-type RadioGroupOptionLiteral = { id: string; label: string; value: string };
+export type RadioGroupOptionLiteral = {
+    id: string;
+    label: string;
+    value: string;
+};
 type RadioGroupOptionInput = Lowercase<string> | RadioGroupOptionLiteral;
 
 function toRadioGroupOption(input: RadioGroupOptionInput) {
