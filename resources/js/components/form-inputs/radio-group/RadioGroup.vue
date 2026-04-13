@@ -2,6 +2,7 @@
 import { type RadioGroupOptionLiteral } from '@/components/form-inputs/radio-group/utils';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
 
 const props = withDefaults(
     defineProps<{
@@ -9,6 +10,7 @@ const props = withDefaults(
         options: RadioGroupOptionLiteral[];
         id?: string;
         defaultValue?: string;
+        subtext?: string;
     }>(),
     { defaultValue: '' },
 );
@@ -20,7 +22,18 @@ defineEmits(['change']);
 <template>
     <div :id class="ml-1">
         <!-- Question -->
-        <p class="mb-3 text-sm font-bold">{{ prompt }}</p>
+        <p
+            :class="
+                cn('mb-2 text-sm font-bold', {
+                    'mb-3': !subtext || subtext.length === 0,
+                })
+            "
+        >
+            {{ prompt }}
+        </p>
+        <p v-if="subtext?.length" class="mb-3 text-xs text-muted-foreground">
+            {{ subtext }}
+        </p>
 
         <!-- Possible answers -->
         <div class="ml-2">
