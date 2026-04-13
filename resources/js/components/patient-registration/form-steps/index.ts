@@ -14,9 +14,10 @@
  * (7) Consent, Declarations & Review
  */
 
-import { defineComponent, h, ref, type Component } from 'vue';
-import PersonalDetails from './PersonalDetails.vue';
-// import EligibilityChecks from './EligibilityChecks.vue';
+import { type Component } from 'vue';
+import Contact from '@/components/patient-registration/form-steps/Contact.vue';
+// import EligibilityChecks from '@/components/patient-registration/form-steps/EligibilityChecks.vue';
+import PersonalDetails from '@/components/patient-registration/form-steps/PersonalDetails.vue';
 
 export interface FormStep {
     id: string; // iteration key: must be unique
@@ -24,20 +25,6 @@ export interface FormStep {
     component: Component;
     props?: Record<string, unknown>;
 }
-
-const PlaceholderStep = defineComponent({
-    name: 'PlaceholderStep',
-    setup() {
-        const count = ref(0);
-        const increment = () => count.value++;
-
-        return () =>
-            h('div', { class: 'container' }, [
-                h('p', `Count is: ${count.value}`),
-                h('button', { onClick: increment }, 'Increment'),
-            ]);
-    },
-});
 
 // A Step can currently be accessed using the array index & `step` state
 // A Map could potentially be better than an array - can be accessed by the name of the step if necessary - may also be a premature optimisation
@@ -53,9 +40,9 @@ const formSteps: FormStep[] = [
         component: PersonalDetails,
     },
     {
-        id: 'placeholder',
-        title: 'Placeholder',
-        component: PlaceholderStep,
+        id: 'contact-information',
+        title: 'Contact Information',
+        component: Contact,
     },
 ];
 
