@@ -10,21 +10,12 @@ import {
     binaryRadioGroup,
     createRadioGroupOptions,
 } from '@/components/form-inputs/radio-group/utils';
+import { getTextFieldProps } from '@/components/form-inputs/utils';
 import { Label } from '@/components/ui/label';
 import Separator from '@/components/ui/separator/Separator.vue';
-import type { TanstackField } from '@/types';
 import { type PatientRegistrationForm } from '../form';
 
 const props = defineProps<{ form: PatientRegistrationForm }>();
-
-function getTextFieldProps(field: TanstackField) {
-    return {
-        name: field.name,
-        value: field.state.value,
-        onInput: (e: Event) =>
-            field.handleChange((e.target as HTMLInputElement).value),
-    };
-}
 
 // Conditionally rendered fields
 const genderIdentity = props.form.useStore(
@@ -35,7 +26,7 @@ const sexAtBirth = props.form.useStore(
 );
 
 // Reset conditionally rendered field when corresponding input is unmounted
-// TODO: For UX reasons, it may be better to clear this on submit.
+// REVIEW: For UX reasons, it may be better to clear this on submit.
 // TODO: determine if resetting between input changes will annoy the user or not & if implementing reset on submit is worth it
 watch(genderIdentity, (state) => {
     if (state !== 'other') {
