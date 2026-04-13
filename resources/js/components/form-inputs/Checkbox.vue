@@ -4,7 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
 const props = defineProps<{
-    class: HTMLAttributes['class'];
+    class?: HTMLAttributes['class'];
     id: string;
     label: string;
 }>();
@@ -14,7 +14,7 @@ defineEmits(['change']);
 </script>
 
 <template>
-    <div class="ml-1 flex gap-2">
+    <div class="ml-1 flex gap-2 [*+&]:mt-2">
         <Checkbox
             :id
             :class="props.class"

@@ -10,12 +10,15 @@
 // Precognition useForm
 // Tanstack useForm
 
-import { computed, ref, watchEffect } from 'vue';
+import { useLocalStorage } from '@vueuse/core';
+import { computed, watchEffect } from 'vue';
 import { createPatientRegistrationForm } from '@/components/patient-registration/form';
 import formSteps from '@/components/patient-registration/form-steps';
 import { Button } from '@/components/ui/button';
 
-const stepIndex = ref(0);
+// REVIEW: [DEV] local storage used so I don't have to keep navigating form steps
+// Rest of the form details are NOT stored in local storage
+const stepIndex = useLocalStorage('registration-form-step', 0);
 const step = computed(() => formSteps[stepIndex.value]);
 
 watchEffect(() => console.log({ stepIndex, step: step.value.id }));

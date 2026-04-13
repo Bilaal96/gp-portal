@@ -6,8 +6,12 @@ export interface DateOfBirth<T = number | null> {
     year: T;
 }
 
-type ContactMethod = 'phone' | 'sms' | 'email' | 'letter';
+export type ContactMethod = 'phone' | 'sms' | 'email' | 'letter';
 
+/**
+ * NOTE: if a union type explicitly contains `undefined`, the corresponding field is required & its default value is `undefined`.
+ * For required fields, you can check for `undefined` to ensure that the user has provided input.
+ */
 interface FormTypes {
     personal: {
         dateOfBirth: DateOfBirth;
@@ -19,10 +23,11 @@ interface FormTypes {
             | 'non-binary'
             | 'other'
             | 'undisclosed';
-        meetsUkResidencyDuration?: boolean;
+        meetsUkResidencyDuration: boolean | undefined;
     };
     contact: {
-        preferredContactMethod: ContactMethod[];
+        hasFixedAddress: boolean | undefined;
+        preferredContactMethods: ContactMethod[];
     };
 }
 
@@ -74,7 +79,7 @@ export const defaultValues = {
         acknowledgedApplicationProcessDuration: false,
     },
     contact: {
-        hasNoFixedAddress: false,
+        hasFixedAddress: undefined as FormTypes['contact']['hasFixedAddress'],
         address1: '',
         address2: '',
         city: '',
@@ -82,8 +87,8 @@ export const defaultValues = {
         phone: '',
         phoneLandline: '',
         email: '',
-        preferredContactMethod:
-            [] as FormTypes['contact']['preferredContactMethod'],
+        preferredContactMethods:
+            [] as FormTypes['contact']['preferredContactMethods'],
     },
 };
 
