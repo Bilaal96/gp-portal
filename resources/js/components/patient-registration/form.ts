@@ -84,8 +84,8 @@ export const defaultValues = {
         address2: '',
         city: '',
         postCode: '',
-        phone: '',
-        phoneLandline: '',
+        primaryPhone: '',
+        secondaryPhone: '',
         email: '',
         preferredContactMethods:
             [] as FormTypes['contact']['preferredContactMethods'],
