@@ -1,35 +1,5 @@
 import { useForm } from '@tanstack/vue-form';
-
-export interface DateOfBirth<T = number | null> {
-    day: T;
-    month: T;
-    year: T;
-}
-
-export type ContactMethod = 'phone' | 'sms' | 'email' | 'letter';
-
-/**
- * NOTE: if a union type explicitly contains `undefined`, the corresponding field is required & its default value is `undefined`.
- * For required fields, you can check for `undefined` to ensure that the user has provided input.
- */
-interface FormTypes {
-    personal: {
-        dateOfBirth: DateOfBirth;
-        sexAtBirth: 'male' | 'female' | 'undisclosed';
-        isPregnant?: boolean;
-        genderIdentity:
-            | 'male'
-            | 'female'
-            | 'non-binary'
-            | 'other'
-            | 'undisclosed';
-        meetsUkResidencyDuration: boolean | undefined;
-    };
-    contact: {
-        hasFixedAddress: boolean | undefined;
-        preferredContactMethods: ContactMethod[];
-    };
-}
+import type { FormTypes } from '@/components/patient-registration/form/types';
 
 // ? If a value is marked as dependency: the preceding input value determines if it renders or not.
 export const defaultValues = {
@@ -93,13 +63,9 @@ export const defaultValues = {
 };
 
 // Form factory - required to extract type of useForm instance
-export function createPatientRegistrationForm() {
-    return useForm({ defaultValues });
+// Must be called within a component's setup() function or SFC (because it is a composable)
+export function usePatientRegistrationForm(
+    formOptions: Record<string, unknown> = {},
+) {
+    return useForm({ defaultValues, ...formOptions });
 }
-
-// Derived types
-export type PatientRegistrationFormValues = typeof defaultValues;
-
-export type PatientRegistrationForm = ReturnType<
-    typeof createPatientRegistrationForm
->;

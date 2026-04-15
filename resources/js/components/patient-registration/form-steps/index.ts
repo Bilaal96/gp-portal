@@ -15,33 +15,47 @@
  */
 
 import { type Component } from 'vue';
+import type { PatientRegistrationForm } from '@/components/patient-registration/form/types';
 import Contact from '@/components/patient-registration/form-steps/Contact.vue';
 // import EligibilityChecks from '@/components/patient-registration/form-steps/EligibilityChecks.vue';
 import PersonalDetails from '@/components/patient-registration/form-steps/PersonalDetails.vue';
 
-export interface FormStep {
-    id: string; // iteration key: must be unique
+export interface FormStepProps {
+    form: PatientRegistrationForm;
+    id: string;
     title: string;
+}
+
+export interface FormStepConfig {
     component: Component;
-    props?: Record<string, unknown>;
+
+    // The form instance is created using a composable which must be used within a component (otherwise Vue will emit a console warning)
+    props: Omit<FormStepProps, 'form'>;
 }
 
 // A Step can currently be accessed using the array index & `step` state
 // A Map could potentially be better than an array - can be accessed by the name of the step if necessary - may also be a premature optimisation
-const formSteps: FormStep[] = [
+const formSteps: FormStepConfig[] = [
     // {
+    //     component: EligibilityChecks,
     //     id: 'eligibility',
     //     title: 'Eligibility Checks',
-    //     component: EligibilityChecks,
     // },
     {
-        id: 'personal-details',
-        title: 'Personal Details',
         component: PersonalDetails,
+        props: {
+            id: 'personal-details',
+            title: 'Personal Details',
+        },
     },
     {
-        id: 'contact-information',
-        title: 'Contact Information',
+        component: Contact,
+        props: {
+            id: 'contact-information',
+            title: 'Contact Information',
+        },
+    },
+    {
         component: Contact,
     },
 ];

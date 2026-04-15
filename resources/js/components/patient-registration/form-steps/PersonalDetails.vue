@@ -11,11 +11,11 @@ import {
     createRadioGroupOptions,
 } from '@/components/form-inputs/radio-group/utils';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
+import { type FormStepProps } from '@/components/patient-registration/form-steps';
 import { Label } from '@/components/ui/label';
 import Separator from '@/components/ui/separator/Separator.vue';
-import { type PatientRegistrationForm } from '../form';
 
-const props = defineProps<{ form: PatientRegistrationForm }>();
+const props = defineProps<FormStepProps>();
 
 // Conditionally rendered fields
 const genderIdentity = props.form.useStore(
@@ -47,8 +47,8 @@ watch(personal, (state) =>
 </script>
 
 <template>
-    <div>
-        <h1 class="mb-2 text-2xl font-bold">Personal Details</h1>
+    <div :id="props.id">
+        <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
 
         <p class="mb-4">
             Before we begin, we must confirm if you are applying for yourself or

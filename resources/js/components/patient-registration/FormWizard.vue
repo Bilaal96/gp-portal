@@ -12,7 +12,7 @@
 
 import { useLocalStorage } from '@vueuse/core';
 import { computed, watchEffect } from 'vue';
-import { createPatientRegistrationForm } from '@/components/patient-registration/form';
+import { usePatientRegistrationForm } from '@/components/patient-registration/form/utils';
 import formSteps from '@/components/patient-registration/form-steps';
 import { Button } from '@/components/ui/button';
 
@@ -21,9 +21,9 @@ import { Button } from '@/components/ui/button';
 const stepIndex = useLocalStorage('registration-form-step', 0);
 const step = computed(() => formSteps[stepIndex.value]);
 
-watchEffect(() => console.log({ stepIndex, step: step.value.id }));
+const form = usePatientRegistrationForm();
 
-const form = createPatientRegistrationForm();
+watchEffect(() => console.log({ stepIndex, step: step.value.props.id }));
 
 function prevStep() {
     stepIndex.value = stepIndex.value - 1;
@@ -57,12 +57,7 @@ function nextStep() {
                 <Button
                     v-if="stepIndex + 1 !== formSteps.length"
                     class="ml-auto cursor-pointer"
-                    @click="
-                        () => {
-                            nextStep();
-                            console.log({ form: form.state.values });
-                        }
-                    "
+                    @click="nextStep()"
                     >Next</Button
                 >
             </div>

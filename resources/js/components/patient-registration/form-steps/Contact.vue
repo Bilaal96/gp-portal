@@ -5,16 +5,12 @@ import Input from '@/components/form-inputs/Input.vue';
 import RadioGroup from '@/components/form-inputs/radio-group/RadioGroup.vue';
 import { binaryRadioGroup } from '@/components/form-inputs/radio-group/utils';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
-import type {
-    ContactMethod,
-    PatientRegistrationForm,
-} from '@/components/patient-registration/form';
+import type { ContactMethod } from '@/components/patient-registration/form/types';
+import { type FormStepProps } from '@/components/patient-registration/form-steps';
 import { Separator } from '@/components/ui/separator';
 import { capitalize } from '@/lib/utils';
 
-const props = defineProps<{
-    form: PatientRegistrationForm;
-}>();
+const props = defineProps<FormStepProps>();
 
 const contactMethods: ContactMethod[] = ['phone', 'sms', 'email', 'letter'];
 
@@ -40,8 +36,8 @@ watch(contact, (state) =>
 </script>
 
 <template>
-    <div>
-        <h1 class="mb-2 text-2xl font-bold">Address & Contact Info</h1>
+    <div :id="props.id">
+        <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
 
         <p class="mb-4">
             Please provide your contact information so we can get in touch with
