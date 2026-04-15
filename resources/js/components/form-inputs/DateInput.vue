@@ -11,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { MONTHS } from '@/lib/constants';
 import { capitalize, cn } from '@/lib/utils';
 import type { TanstackField } from '@/types';
 
@@ -83,25 +84,6 @@ function handleInput(key: 'day' | 'year', e: Event) {
         formState: props.field.state.value[key],
     });
 }
-
-/**
- * List of each month in a year.
- * Used to list `Select` options for the `month` input.
- */
-const MONTHS = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-];
 </script>
 <template>
     <!-- 
