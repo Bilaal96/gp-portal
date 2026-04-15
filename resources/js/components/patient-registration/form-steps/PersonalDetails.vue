@@ -2,7 +2,7 @@
 import { watch } from 'vue';
 import {
     Checkbox,
-    DateOfBirthInput,
+    DateInput,
     Input,
     RadioGroup,
 } from '@/components/form-inputs';
@@ -101,7 +101,11 @@ watch(personal, (state) =>
 
             <!-- Date of Birth - restrict to any past date -->
             <form.Field name="personal.dateOfBirth" v-slot="{ field }">
-                <DateOfBirthInput id-prefix="applicant" :field />
+                <DateInput
+                    id-prefix="applicant-dob"
+                    :field
+                    label="Date of Birth"
+                />
             </form.Field>
 
             <Separator class="my-2" />

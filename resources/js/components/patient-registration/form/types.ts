@@ -5,7 +5,7 @@ import {
 
 export type ContactMethod = 'phone' | 'sms' | 'email' | 'letter';
 
-export interface DateOfBirth<T = number | null> {
+export interface TDate<T = number | null> {
     day: T;
     month: T;
     year: T;
@@ -22,7 +22,7 @@ export interface DateOfBirth<T = number | null> {
  */
 export interface FormTypes {
     personal: {
-        dateOfBirth: DateOfBirth;
+        dateOfBirth: TDate;
         sexAtBirth: 'male' | 'female' | 'undisclosed';
         isPregnant?: boolean;
         genderIdentity:

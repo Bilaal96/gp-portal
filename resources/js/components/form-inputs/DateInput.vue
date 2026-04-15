@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type InputHTMLAttributes } from 'vue';
 import { Input } from '@/components/form-inputs';
-import { type DateOfBirth } from '@/components/patient-registration/form';
+import { type TDate } from '@/components/patient-registration/form/types';
 import {
     Select,
     SelectContent,
@@ -15,8 +15,9 @@ import { capitalize, cn } from '@/lib/utils';
 import type { TanstackField } from '@/types';
 
 const props = defineProps<{
+    field: TanstackField<TDate>;
+    label: string;
     idPrefix?: string;
-    field: TanstackField<DateOfBirth>;
     required?: boolean;
 }>();
 
@@ -26,7 +27,7 @@ const props = defineProps<{
  */
 function getInputId(key: 'day' | 'month' | 'year') {
     const prefix = props.idPrefix ? props.idPrefix + '-' : '';
-    return prefix + 'dob-' + key;
+    return prefix + key;
 }
 
 /**
@@ -64,7 +65,6 @@ function getInputProps(
 
 /**
  * Synchronises `day` & `year` inputs with the corresponding tanstack form state.
- * Note that `dateOfBirth` state must conform to the `DateOfBirth` type.
  */
 function handleInput(key: 'day' | 'year', e: Event) {
     const subFieldName = `${props.field.name}.${key}`;
@@ -77,7 +77,7 @@ function handleInput(key: 'day' | 'year', e: Event) {
     );
 
     // [DEBUG] input value & corresponding state
-    console.log('DateOfBirthInput', {
+    console.log('DateInput', {
         key,
         inputValue: subFieldValue,
         formState: props.field.state.value[key],
@@ -126,8 +126,8 @@ const MONTHS = [
         --------------------------------------------------
 
         ? Can i update nested fields 
-        - e.g. have one dateOfBirth field wrapping all 3 inputs
-        - pass field to each input, then update dateOfBirth.day, dateOfBirth.month, dateOfBirth.year
+        - e.g. have one date field wrapping all 3 inputs
+        - pass field to each input, then update date.day, date.month, date.year
         * YES - use field.form.setFieldValue(fieldName, value) in @input
 
         ? I could set the field value to an object containing day, month, year properties
@@ -138,6 +138,7 @@ const MONTHS = [
         ? Should state store a single Date() instance or 3 separate values:
         - separate is more flexible - construct & format dates however you want.
         ? should the separate values be string or number type?
+        - went with number as it can easily be converted to string
 
         ? If I use a Date() instance, will laravel parse it correctly?
         - yes it can, usually sent as ISO string - you may need to use the Carbon library to explicitly tell Laravel how to treat it
@@ -158,7 +159,7 @@ const MONTHS = [
     -->
 
     <fieldset>
-        <legend class="mb-1 ml-1 text-sm font-bold">Date of Birth</legend>
+        <legend class="mb-1 ml-1 text-sm font-bold">{{ props.label }}</legend>
 
         <p class="mb-2 ml-1 text-xs text-muted-foreground">
             e.g. January 15 1987
