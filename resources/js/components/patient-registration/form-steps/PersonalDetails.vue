@@ -14,6 +14,7 @@ import { getTextFieldProps } from '@/components/form-inputs/utils';
 import { type FormStepProps } from '@/components/patient-registration/form-steps';
 import { Label } from '@/components/ui/label';
 import Separator from '@/components/ui/separator/Separator.vue';
+import { useDebugForm } from '@/composables/useDebugForm';
 
 const props = defineProps<FormStepProps>();
 
@@ -40,10 +41,7 @@ watch(sexAtBirth, (state) => {
 });
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
-const personal = props.form.useStore((state) => state.values.personal);
-watch(personal, (state) =>
-    console.log('Personal Details', JSON.parse(JSON.stringify(state))),
-);
+useDebugForm(props.form, { formStep: 'personal', label: 'Personal Details' });
 </script>
 
 <template>

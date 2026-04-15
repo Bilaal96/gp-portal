@@ -8,6 +8,7 @@ import { getTextFieldProps } from '@/components/form-inputs/utils';
 import type { ContactMethod } from '@/components/patient-registration/form/types';
 import { type FormStepProps } from '@/components/patient-registration/form-steps';
 import { Separator } from '@/components/ui/separator';
+import { useDebugForm } from '@/composables/useDebugForm';
 import { capitalize } from '@/lib/utils';
 
 const props = defineProps<FormStepProps>();
@@ -29,10 +30,7 @@ watch(hasFixedAddress, (state) => {
 });
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
-const contact = props.form.useStore((state) => state.values.contact);
-watch(contact, (state) =>
-    console.log('Contact Info', JSON.parse(JSON.stringify(state))),
-);
+useDebugForm(props.form, { formStep: 'contact', label: 'Contact Info' });
 </script>
 
 <template>
