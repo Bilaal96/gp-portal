@@ -18,6 +18,7 @@ import { type Component } from 'vue';
 import type { PatientRegistrationForm } from '@/components/patient-registration/form/types';
 import Contact from '@/components/patient-registration/form-steps/Contact.vue';
 // import EligibilityChecks from '@/components/patient-registration/form-steps/EligibilityChecks.vue';
+import Identity from '@/components/patient-registration/form-steps/Identity.vue';
 import PersonalDetails from '@/components/patient-registration/form-steps/PersonalDetails.vue';
 
 export interface FormStepProps {
@@ -56,7 +57,11 @@ const formSteps: FormStepConfig[] = [
         },
     },
     {
-        component: Contact,
+        component: Identity,
+        props: {
+            id: 'identity',
+            title: 'NHS & Identity Details',
+        },
     },
 ];
 

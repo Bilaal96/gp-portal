@@ -60,6 +60,18 @@ export const defaultValues = {
         preferredContactMethods:
             [] as FormTypes['contact']['preferredContactMethods'],
     },
+    identity: {
+        nhsNumber: '',
+        nationalInsuranceNumber: '',
+
+        countryOfBirth: '',
+        // ? dependency: render if country of birth is not UK
+        ukFirstArrivalDate: {
+            day: null,
+            month: null,
+            year: null,
+        } as FormTypes['identity']['ukFirstArrivalDate'],
+    },
 };
 
 // Form factory - required to extract type of useForm instance

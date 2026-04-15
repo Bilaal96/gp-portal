@@ -14,6 +14,7 @@ export interface TDate<T = number | null> {
 /* ----------------------------- Composed types ----------------------------- */
 /**
  * Used to enforce types on the Patient Registration Form's `defaultValues` tanstack form option.
+ * Primitive types do not need to be listed as they can easily be inferred.
  *
  * __NOTE:__
  * (1) A field is only optional if it's explicitly suffixed with `?`.
@@ -36,6 +37,9 @@ export interface FormTypes {
     contact: {
         hasFixedAddress: boolean | undefined;
         preferredContactMethods: ContactMethod[];
+    };
+    identity: {
+        ukFirstArrivalDate: TDate;
     };
 }
 
