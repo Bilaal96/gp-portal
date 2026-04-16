@@ -127,7 +127,10 @@ useDebugForm(props.form, {
                     id="request-medical-records-radio-group"
                     prompt="Would you like us to request your medical records?"
                     :options="binaryRadioGroup()"
-                    @change="(value) => field.handleChange(value)"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
                 />
             </form.Field>
 
@@ -142,7 +145,10 @@ useDebugForm(props.form, {
                     id="served-in-armed-forces-radio-group"
                     prompt="Have you served in the Armed Forces?"
                     :options="binaryRadioGroup()"
-                    @change="(value) => field.handleChange(value)"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
                 />
             </form.Field>
 
@@ -155,7 +161,10 @@ useDebugForm(props.form, {
                     id="is-veteran-radio-group"
                     prompt="Are you a veteran?"
                     :options="binaryRadioGroup()"
-                    @change="(value) => field.handleChange(value)"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
                 />
             </form.Field>
         </div>
