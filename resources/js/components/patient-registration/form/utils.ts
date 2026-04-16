@@ -1,6 +1,12 @@
 import { useForm } from '@tanstack/vue-form';
 import type { FormTypes } from '@/components/patient-registration/form/types';
 
+const DEFAULT_DATE = {
+    day: null,
+    month: null,
+    year: null,
+};
+
 // ? If a value is marked as dependency: the preceding input value determines if it renders or not.
 export const defaultValues = {
     proxyRegistrationGuard: {
@@ -24,9 +30,7 @@ export const defaultValues = {
 
         // date of birth - custom input
         dateOfBirth: {
-            day: null,
-            month: null,
-            year: null,
+            ...DEFAULT_DATE,
         } as FormTypes['personal']['dateOfBirth'],
 
         // radio - (include "prefer not to say" option)
@@ -67,10 +71,26 @@ export const defaultValues = {
         countryOfBirth: '',
         // ? dependency: render if country of birth is not UK
         ukFirstArrivalDate: {
-            day: null,
-            month: null,
-            year: null,
+            ...DEFAULT_DATE,
         } as FormTypes['identity']['ukFirstArrivalDate'],
+    },
+    previousMedicalRecords: {
+        previousGP: {
+            name: '',
+            address1: '',
+            address2: '',
+            city: '',
+            postCode: '',
+            departureDate: {
+                ...DEFAULT_DATE,
+            } as FormTypes['previousMedicalRecords']['previousGP']['departureDate'],
+        },
+        shouldRequestMedicalRecords:
+            undefined as FormTypes['previousMedicalRecords']['shouldRequestMedicalRecords'],
+        hasServedInArmedForces:
+            undefined as FormTypes['previousMedicalRecords']['hasServedInArmedForces'],
+        isVeteran:
+            undefined as FormTypes['previousMedicalRecords']['isVeteran'],
     },
 };
 

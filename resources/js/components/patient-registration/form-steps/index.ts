@@ -20,6 +20,7 @@ import Contact from '@/components/patient-registration/form-steps/Contact.vue';
 // import EligibilityChecks from '@/components/patient-registration/form-steps/EligibilityChecks.vue';
 import Identity from '@/components/patient-registration/form-steps/Identity.vue';
 import PersonalDetails from '@/components/patient-registration/form-steps/PersonalDetails.vue';
+import PreviousMedicalRecords from '@/components/patient-registration/form-steps/PreviousMedicalRecords.vue';
 
 export interface FormStepProps {
     form: PatientRegistrationForm;
@@ -61,6 +62,13 @@ const formSteps: FormStepConfig[] = [
         props: {
             id: 'identity',
             title: 'NHS & Identity Details',
+        },
+    },
+    {
+        component: PreviousMedicalRecords,
+        props: {
+            id: 'previous-medical-records',
+            title: 'Previous Medical Records',
         },
     },
 ];

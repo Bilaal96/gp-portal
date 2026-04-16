@@ -41,6 +41,14 @@ export interface FormTypes {
     identity: {
         ukFirstArrivalDate: TDate;
     };
+    previousMedicalRecords: {
+        previousGP: {
+            departureDate: TDate;
+        };
+        shouldRequestMedicalRecords: boolean | undefined;
+        hasServedInArmedForces: boolean | undefined;
+        isVeteran: boolean | undefined;
+    };
 }
 
 export type PatientRegistrationFormValues = typeof defaultValues;
