@@ -30,7 +30,7 @@ watch(hasFixedAddress, (state) => {
 });
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
-useDebugForm(props.form, { formStep: 'contact', label: 'Contact Info' });
+useDebugForm(props.form, { formStep: 'contact', label: props.title });
 </script>
 
 <template>

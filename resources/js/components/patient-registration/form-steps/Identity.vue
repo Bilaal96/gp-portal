@@ -34,7 +34,7 @@ watch(countryOfBirth, (state) => {
 });
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
-useDebugForm(props.form, { formStep: 'identity', label: 'Identity' });
+useDebugForm(props.form, { formStep: 'identity', label: props.title });
 </script>
 
 <template>

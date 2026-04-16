@@ -41,7 +41,7 @@ watch(sexAtBirth, (state) => {
 });
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
-useDebugForm(props.form, { formStep: 'personal', label: 'Personal Details' });
+useDebugForm(props.form, { formStep: 'personal', label: props.title });
 </script>
 
 <template>
