@@ -19,8 +19,12 @@ interface TanstackForm {
 export function useDebugForm(
     form: TanstackForm,
     options: {
-        formStep?: string; // debug a given step in a multi-step form
-        label?: string; // identifies the log
+        // debug a given step in a multi-step form
+        // -- should match the name of a field passed to useForm's defaultValues option
+        formStep?: string;
+
+        // identifies the log
+        label?: string;
     } = {},
 ) {
     // Set default options
