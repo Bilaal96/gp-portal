@@ -50,12 +50,14 @@ function nextStep() {
             <div class="mt-6 flex">
                 <Button
                     v-if="stepIndex - 1 !== -1"
+                    type="button"
                     class="cursor-pointer bg-foreground hover:bg-foreground/90"
                     @click="prevStep()"
                     >Back</Button
                 >
                 <Button
                     v-if="stepIndex + 1 !== formSteps.length"
+                    type="button"
                     class="ml-auto cursor-pointer"
                     @click="nextStep()"
                     >Next</Button
