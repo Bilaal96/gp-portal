@@ -11,7 +11,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useDebugForm } from '@/composables/useDebugForm';
+import { LONG_TERM_HEALTH_CONDITIONS } from '@/lib/constants';
 import type { TanstackArrayField, TanstackField } from '@/types';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/components/ui/accordion';
 
 const props = defineProps<FormStepProps>();
 
@@ -104,8 +111,61 @@ watch(showLongTermConditionsOther, (value) =>
                 - `longTermConditions.other` = sub-field used to add fields to `longTermConditions.items`
             -->
             <p class="mb-2 ml-1 text-sm font-bold">
-                Do you have any long-term medical conditions?
+                Please inform us of any long term medical conditions that you
+                have:
             </p>
+
+            <Accordion type="multiple" collapsible class="mx-4">
+                <template
+                    v-for="(
+                        categoryItems, categoryName
+                    ) in LONG_TERM_HEALTH_CONDITIONS"
+                    :key="categoryName"
+                >
+                    <AccordionItem :value="categoryName">
+                        <AccordionTrigger>{{ categoryName }}</AccordionTrigger>
+                        <AccordionContent>
+                            <form.Field
+                                name="healthOverview.longTermConditions.items"
+                                v-slot="{ field }"
+                            >
+                                <template
+                                    v-for="condition in categoryItems"
+                                    :key="condition"
+                                >
+                                    <Checkbox
+                                        :id="condition"
+                                        :label="condition"
+                                        @change="
+                                            (checked) => {
+                                                const selectedConditions =
+                                                    field.state.value;
+
+                                                if (checked) {
+                                                    // add health condition to state
+                                                    field.handleChange([
+                                                        ...selectedConditions,
+                                                        condition,
+                                                    ]);
+                                                } else {
+                                                    // remove health condition from state
+                                                    field.handleChange(
+                                                        selectedConditions.filter(
+                                                            (shc) =>
+                                                                shc !==
+                                                                condition,
+                                                        ),
+                                                    );
+                                                }
+                                            }
+                                        "
+                                    />
+                                </template>
+                            </form.Field>
+                        </AccordionContent>
+                    </AccordionItem>
+                </template>
+            </Accordion>
 
             <form.Field
                 name="healthOverview.longTermConditions.items"
