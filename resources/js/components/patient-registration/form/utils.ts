@@ -92,6 +92,16 @@ export const defaultValues = {
         isVeteran:
             undefined as FormTypes['previousMedicalRecords']['isVeteran'],
     },
+    healthOverview: {
+        longTermConditions: {
+            items: [] as string[],
+            others: [] as string[],
+            other: '',
+        } as FormTypes['healthOverview']['longTermConditions'],
+        hasMajorIncidents: undefined,
+        majorIncidents: [],
+        isUnderSpecialistCare: undefined,
+    },
 };
 
 // Form factory - required to extract type of useForm instance

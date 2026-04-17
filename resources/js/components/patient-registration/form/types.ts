@@ -49,6 +49,13 @@ export interface FormTypes {
         hasServedInArmedForces: boolean | undefined;
         isVeteran: boolean | undefined;
     };
+    healthOverview: {
+        longTermConditions: {
+            items: string[];
+            others: string[];
+            other: string;
+        };
+    };
 }
 
 export type PatientRegistrationFormValues = typeof defaultValues;
