@@ -85,9 +85,13 @@ const groupedOptions = computed(() => {
     return normalisedOptions;
 });
 
+function closeCommandList() {
+    open.value = false;
+}
+
 function handleOptionSelect(option: LabelledOption) {
     emit('update:selectedOptions', option.value);
-    open.value = false;
+    closeCommandList();
 }
 
 const getCommandItemStyles = (optionValue: string) => {
@@ -115,7 +119,7 @@ const showCheckIcon = (optionValue: string) => {
                 :aria-expanded="open"
                 :class="
                     cn(
-                        'justify-between hover:cursor-pointer hover:bg-primary/40',
+                        'mb-2 justify-between hover:cursor-pointer hover:bg-primary/40',
                         width,
                     )
                 "
@@ -128,7 +132,17 @@ const showCheckIcon = (optionValue: string) => {
         </PopoverTrigger>
         <PopoverContent :class="cn('p-0', width)" align="start">
             <Command>
-                <CommandInput :placeholder="placeholder ?? 'Search'" />
+                <CommandInput :placeholder="placeholder ?? 'Search'">
+                    <!-- Slot reserved for action button -->
+                    <template #action="slotProps">
+                        <slot
+                            name="action"
+                            v-bind="slotProps"
+                            :close-combobox="closeCommandList"
+                        />
+                    </template>
+                </CommandInput>
+
                 <CommandList>
                     <CommandEmpty>{{
                         emptyPrompt ?? 'No matches found.'

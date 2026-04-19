@@ -35,5 +35,8 @@ const { filterState } = useCommand()
       auto-focus
       :class="cn('placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50', props.class)"
     />
+
+    <!-- Slot reserved for button -->
+    <slot name="action" :input="filterState.search" />
   </div>
 </template>
