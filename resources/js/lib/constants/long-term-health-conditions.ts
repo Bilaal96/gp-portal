@@ -117,7 +117,6 @@ export default {
         'Skin cancer (melanoma)',
         'Leukaemia',
         'Lymphoma',
-        'Other cancer',
     ],
     Sensory: ['Glaucoma', 'Macular degeneration', 'Cataracts', 'Hearing loss'],
     Other: [
@@ -126,6 +125,5 @@ export default {
         'Long COVID',
         'Chronic pain condition',
         'Substance use disorder',
-        'Other',
     ],
 };
