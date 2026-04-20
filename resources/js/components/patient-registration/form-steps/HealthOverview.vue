@@ -15,6 +15,10 @@ import { useDebugForm } from '@/composables/useDebugForm';
 import { LONG_TERM_HEALTH_CONDITIONS } from '@/lib/constants';
 const props = defineProps<FormStepProps>();
 
+const hasLongTermCondition = props.form.useStore(
+    (state) => state.values.healthOverview.hasLongTermCondition,
+);
+
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
 useDebugForm(props.form, {
     formStep: 'healthOverview',
@@ -28,11 +32,25 @@ useDebugForm(props.form, {
 
         <!-- All Questions -->
         <div class="space-y-4">
-            <!-- RadioGroup (binary) Do you have any long-term medical conditions? -->
+            <!-- Do you have any long-term medical conditions? -->
+            <form.Field
+                name="healthOverview.hasLongTermCondition"
+                v-slot="{ field }"
+            >
+                <RadioGroup
+                    id="has-long-term-condition"
+                    prompt="Do you have any long-term medical conditions?"
+                    :options="binaryRadioGroup()"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
+                />
+            </form.Field>
 
             <!-- Specify long-term medical conditions -->
-            <!-- TODO: Show dependent on previous answer -->
             <form.Field
+                v-if="hasLongTermCondition"
                 name="healthOverview.longTermConditions"
                 v-slot="{ field }"
             >

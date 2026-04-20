@@ -93,6 +93,8 @@ export const defaultValues = {
             undefined as FormTypes['previousMedicalRecords']['isVeteran'],
     },
     healthOverview: {
+        hasLongTermCondition:
+            undefined as FormTypes['healthOverview']['hasLongTermCondition'],
         longTermConditions:
             [] as FormTypes['healthOverview']['longTermConditions'],
         hasMajorIncidents: undefined,
