@@ -1,21 +1,46 @@
 <script setup lang="ts">
 import { MinusCircleIcon, PlusCircleIcon } from 'lucide-vue-next';
+import { reactive } from 'vue';
 import BadgeList from '@/components/BadgeList.vue';
 import {
     Input,
     MultiSelectCombobox,
     RadioGroup,
+    Textarea,
 } from '@/components/form-inputs';
 import { binaryRadioGroup } from '@/components/form-inputs/radio-group/utils';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
 import { type FormStepProps } from '@/components/patient-registration/form-steps';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+
 import { useDebugForm } from '@/composables/useDebugForm';
+import { useDebugReactive } from '@/composables/useDebugReactive';
 import { LONG_TERM_HEALTH_CONDITIONS } from '@/lib/constants';
+
 const props = defineProps<FormStepProps>();
 
-const hasLongTermCondition = props.form.useStore(
+const majorIncidents = reactive({
+    showFormFields: true,
+    title: '',
+    reason: '',
+    details: '',
+});
+
+function resetMajorIncidentsFormFields() {
+    majorIncidents.title = '';
+    majorIncidents.reason = '';
+    majorIncidents.details = '';
+}
+
+function resetMajorIncidents() {
+    resetMajorIncidentsFormFields();
+    majorIncidents.showFormFields = false;
+}
+
+// REVIEW: should I refactor to use reactive local state - will be more concise
+// Used to conditionally render other fields
+const hasLongTermConditions = props.form.useStore(
     (state) => state.values.healthOverview.hasLongTermCondition,
 );
 
@@ -24,6 +49,8 @@ useDebugForm(props.form, {
     formStep: 'healthOverview',
     label: props.title,
 });
+
+useDebugReactive(majorIncidents, 'majorIncidents (Reactive):');
 </script>
 
 <template>
@@ -32,7 +59,7 @@ useDebugForm(props.form, {
 
         <!-- All Questions -->
         <div class="space-y-4">
-            <!-- Do you have any long-term medical conditions? -->
+            <!-- RadioGroup (binary) - Do you have any long-term medical conditions? -->
             <form.Field
                 name="healthOverview.hasLongTermCondition"
                 v-slot="{ field }"
@@ -48,9 +75,9 @@ useDebugForm(props.form, {
                 />
             </form.Field>
 
-            <!-- Specify long-term medical conditions -->
+            <!-- MultiSelectCombobox - Specify long-term medical conditions -->
             <form.Field
-                v-if="hasLongTermCondition"
+                v-if="hasLongTermConditions"
                 name="healthOverview.longTermConditions"
                 v-slot="{ field }"
             >
@@ -115,15 +142,120 @@ useDebugForm(props.form, {
 
             <Separator class="my-4" />
 
-            <!-- RadioGroup (binary) - Have you had any major surgeries or hospital admissions?
-                - if yes -> render textarea & request details
+            <!-- 
+                Please inform us of any major medical procedures or events that
+                have occurred
+                
+                Collect incident details
+                - title - Input 
+                - reason - Input 
+                - details - textarea
+
+                Buttons
+                - Add Incident - shows form fields + toggles show state to true
+                - Log Incident - push field values to tanstack form state + reset majorIncidents state
+                - Cancel - reset majorIncidents state
             -->
+            <p class="mb-4 ml-1 text-sm font-bold">
+                Please inform us of any major medical procedures or events that
+                have occurred - e.g. major surgeries or hospital admissions.
+            </p>
+            <Button
+                v-if="majorIncidents.showFormFields === false"
+                class="size-fit py-1"
+                type="button"
+                @click.prevent.stop="majorIncidents.showFormFields = true"
+            >
+                <PlusCircleIcon />
+                <span>Incident</span>
+            </Button>
 
-            <!-- Checkboxes - Do you have any long-term medical conditions? -->
+            <!-- Array Field - majorIncidents -->
+            <form.Field
+                v-if="majorIncidents.showFormFields"
+                name="healthOverview.majorIncidents"
+                v-slot="{ field }"
+            >
+                <div class="space-y-4">
+                    <!-- Title -->
+                    <Input
+                        class="max-w-sm"
+                        label="Incident Title"
+                        placeholder="Give a name to the incident"
+                        id="incident-title"
+                        name="incident-title"
+                        :value="majorIncidents.title"
+                        @input="majorIncidents.title = $event.target.value"
+                    />
 
-            <!-- RadioGroup (binary) - Are you currently under the care of a hospital specialist? -->
+                    <!-- Reason -->
+                    <Input
+                        class="max-w-sm"
+                        label="Incident Reason"
+                        placeholder="Brief description of the incident"
+                        id="incident-reason"
+                        name="incident-reason"
+                        :value="majorIncidents.reason"
+                        @input="majorIncidents.reason = $event.target.value"
+                    />
+
+                    <!-- Details -->
+                    <Textarea
+                        class="min-h-24 max-w-sm"
+                        id="incident-details"
+                        label="Details"
+                        placeholder="Provide additional information..."
+                        name="incident-details"
+                        :value="majorIncidents.details"
+                        @input="majorIncidents.details = $event.target.value"
+                    />
+                </div>
+                <div class="flex items-center gap-2">
+                    <Button
+                        class="size-fit cursor-pointer py-1"
+                        type="button"
+                        size="sm"
+                        @click.prevent.stop="
+                            () => {
+                                const { title, reason, details } =
+                                    majorIncidents;
+
+                                if (title && reason && details) {
+                                    // Log
+                                    field.pushValue({ title, reason, details });
+                                    resetMajorIncidents();
+                                } else {
+                                    // Reject Log
+                                    // TODO user input validation/feedback
+                                    console.warn(
+                                        'Major incidents: must fill in all fields',
+                                    );
+                                }
+                            }
+                        "
+                    >
+                        <PlusCircleIcon />
+                        <span>Log Incident</span>
+                    </Button>
+                    <Button
+                        class="size-fit cursor-pointer py-1"
+                        variant="destructive"
+                        type="button"
+                        size="sm"
+                        @click.prevent.stop="resetMajorIncidents()"
+                    >
+                        <span>Cancel</span>
+                    </Button>
+                </div>
+            </form.Field>
 
             <Separator class="my-4" />
+
+            <!-- Table - Render overview of all incidents -->
+
+            <Separator class="my-4" />
+
+            <!-- RadioGroup (binary) - Are you currently under the care of a hospital specialist? -->
 
             <!-- RadioGroup (binary) - Are you currently taking any medication? 
                 - if yes, render array field (as below) 
@@ -161,22 +293,6 @@ useDebugForm(props.form, {
                     id="prev-gp-address-line-1"
                     v-bind="getTextFieldProps(field)"
                     required
-                />
-            </form.Field>
-
-            <!-- ! RadioGroup (binary) - Would you like us to request your medical records? -->
-            <form.Field
-                name="previousMedicalRecords.shouldRequestMedicalRecords"
-                v-slot="{ field }"
-            >
-                <RadioGroup
-                    id="request-medical-records-radio-group"
-                    prompt="Would you like us to request your medical records?"
-                    :options="binaryRadioGroup()"
-                    @change="
-                        (value) =>
-                            field.handleChange(value === 'yes' ? true : false)
-                    "
                 />
             </form.Field>
         </div>

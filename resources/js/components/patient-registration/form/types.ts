@@ -52,6 +52,7 @@ export interface FormTypes {
     healthOverview: {
         hasLongTermCondition: boolean | undefined;
         longTermConditions: string[];
+        majorIncidents: { title: string; reason: string; details: string }[];
     };
 }
 
