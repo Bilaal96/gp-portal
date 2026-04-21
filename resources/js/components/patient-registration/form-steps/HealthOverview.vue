@@ -11,12 +11,28 @@ import {
 import { binaryRadioGroup } from '@/components/form-inputs/radio-group/utils';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
 import { type FormStepProps } from '@/components/patient-registration/form-steps';
+
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 import { useDebugForm } from '@/composables/useDebugForm';
 import { useDebugReactive } from '@/composables/useDebugReactive';
 import { LONG_TERM_HEALTH_CONDITIONS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 const props = defineProps<FormStepProps>();
 
@@ -162,7 +178,7 @@ useDebugReactive(majorIncidents, 'majorIncidents (Reactive):');
             </p>
             <Button
                 v-if="majorIncidents.showFormFields === false"
-                class="size-fit py-1"
+                class="ml-2 size-fit py-1"
                 type="button"
                 @click.prevent.stop="majorIncidents.showFormFields = true"
             >
@@ -171,87 +187,145 @@ useDebugReactive(majorIncidents, 'majorIncidents (Reactive):');
             </Button>
 
             <!-- Array Field - majorIncidents -->
-            <form.Field
-                v-if="majorIncidents.showFormFields"
-                name="healthOverview.majorIncidents"
-                v-slot="{ field }"
-            >
-                <div class="space-y-4">
-                    <!-- Title -->
-                    <Input
-                        class="max-w-sm"
-                        label="Incident Title"
-                        placeholder="Give a name to the incident"
-                        id="incident-title"
-                        name="incident-title"
-                        :value="majorIncidents.title"
-                        @input="majorIncidents.title = $event.target.value"
-                    />
+            <form.Field name="healthOverview.majorIncidents" v-slot="{ field }">
+                <template v-if="majorIncidents.showFormFields">
+                    <div class="space-y-4">
+                        <!-- Title -->
+                        <Input
+                            class="max-w-sm"
+                            label="Incident Title"
+                            placeholder="Give a name to the incident"
+                            id="incident-title"
+                            name="incident-title"
+                            :value="majorIncidents.title"
+                            @input="majorIncidents.title = $event.target.value"
+                        />
 
-                    <!-- Reason -->
-                    <Input
-                        class="max-w-sm"
-                        label="Incident Reason"
-                        placeholder="Brief description of the incident"
-                        id="incident-reason"
-                        name="incident-reason"
-                        :value="majorIncidents.reason"
-                        @input="majorIncidents.reason = $event.target.value"
-                    />
+                        <!-- Reason -->
+                        <Input
+                            class="max-w-sm"
+                            label="Incident Reason"
+                            placeholder="Brief description of the incident"
+                            id="incident-reason"
+                            name="incident-reason"
+                            :value="majorIncidents.reason"
+                            @input="majorIncidents.reason = $event.target.value"
+                        />
 
-                    <!-- Details -->
-                    <Textarea
-                        class="min-h-24 max-w-sm"
-                        id="incident-details"
-                        label="Details"
-                        placeholder="Provide additional information..."
-                        name="incident-details"
-                        :value="majorIncidents.details"
-                        @input="majorIncidents.details = $event.target.value"
-                    />
-                </div>
-                <div class="flex items-center gap-2">
-                    <Button
-                        class="size-fit cursor-pointer py-1"
-                        type="button"
-                        size="sm"
-                        @click.prevent.stop="
-                            () => {
-                                const { title, reason, details } =
-                                    majorIncidents;
+                        <!-- Details -->
+                        <Textarea
+                            class="min-h-24 max-w-sm"
+                            id="incident-details"
+                            label="Incident Details"
+                            placeholder="Provide additional information..."
+                            name="incident-details"
+                            :value="majorIncidents.details"
+                            @input="
+                                majorIncidents.details = $event.target.value
+                            "
+                        />
+                    </div>
+                    <div class="ml-2 flex items-center gap-2">
+                        <Button
+                            class="size-fit cursor-pointer py-1"
+                            type="button"
+                            size="sm"
+                            @click.prevent.stop="
+                                () => {
+                                    const { title, reason, details } =
+                                        majorIncidents;
 
-                                if (title && reason && details) {
-                                    // Log
-                                    field.pushValue({ title, reason, details });
-                                    resetMajorIncidents();
-                                } else {
-                                    // Reject Log
-                                    // TODO user input validation/feedback
-                                    console.warn(
-                                        'Major incidents: must fill in all fields',
-                                    );
+                                    if (title && reason && details) {
+                                        // Log
+                                        field.pushValue({
+                                            title,
+                                            reason,
+                                            details,
+                                        });
+                                        resetMajorIncidents();
+                                    } else {
+                                        // Reject Log
+                                        // TODO user input validation/feedback
+                                        console.warn(
+                                            'Major incidents: must fill in all fields',
+                                        );
+                                    }
                                 }
-                            }
-                        "
-                    >
-                        <PlusCircleIcon />
-                        <span>Log Incident</span>
-                    </Button>
-                    <Button
-                        class="size-fit cursor-pointer py-1"
-                        variant="destructive"
-                        type="button"
-                        size="sm"
-                        @click.prevent.stop="resetMajorIncidents()"
-                    >
-                        <span>Cancel</span>
-                    </Button>
-                </div>
+                            "
+                        >
+                            <PlusCircleIcon />
+                            <span>Log Incident</span>
+                        </Button>
+                        <Button
+                            class="size-fit cursor-pointer py-1"
+                            variant="destructive"
+                            type="button"
+                            size="sm"
+                            @click.prevent.stop="resetMajorIncidents()"
+                        >
+                            <span>Cancel</span>
+                        </Button>
+                    </div>
+                </template>
+
+                <Accordion collapsible v-slot="{ modelValue }">
+                    <AccordionItem value="logged incidents">
+                        <AccordionTrigger
+                            :class="
+                                cn('mb-1 bg-primary/30 px-4', {
+                                    'text-muted-foreground':
+                                        modelValue === 'logged incidents',
+                                })
+                            "
+                        >
+                            Logged Incidents
+                        </AccordionTrigger>
+                        <AccordionContent class="rounded-sm bg-primary/10">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead>Reason</TableHead>
+                                        <TableHead>Details</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+
+                                <!-- Logged incidents -->
+                                <TableBody v-if="field.state.value.length">
+                                    <TableRow
+                                        v-for="(
+                                            incident, incidentIndex
+                                        ) in field.state.value"
+                                        :key="incidentIndex"
+                                    >
+                                        <TableCell>
+                                            {{ incident.title }}
+                                        </TableCell>
+                                        <TableCell>
+                                            {{ incident.details }}
+                                        </TableCell>
+                                        <TableCell>
+                                            {{ incident.reason }}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+
+                                <!-- No logs (empty table) -->
+                                <TableBody v-else>
+                                    <TableRow>
+                                        <TableCell
+                                            colspan="3"
+                                            class="h-20 text-center"
+                                        >
+                                            No incidents logged
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             </form.Field>
-
-            <Separator class="my-4" />
-
-            <!-- Table - Render overview of all incidents -->
 
             <Separator class="my-4" />
 
