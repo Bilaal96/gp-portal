@@ -12,6 +12,7 @@ export function useDebugReactive<T extends Record<string, unknown>>(
                     [property]: JSON.parse(JSON.stringify(value)),
                 });
             },
+            { deep: true },
         );
     }
 }
@@ -28,5 +29,6 @@ export function useDebugReactiveProp<T extends Record<string, unknown>>(
                 [property]: JSON.parse(JSON.stringify(value)),
             });
         },
+        { deep: true },
     );
 }
