@@ -1,34 +1,21 @@
-import { watch } from 'vue';
+import { watchEffect } from 'vue';
 
 export function useDebugReactive<T extends Record<string, unknown>>(
     reactiveState: T,
     label: string = 'useDebugReactive',
 ) {
-    for (const property in reactiveState) {
-        watch(
-            () => reactiveState[property],
-            (value) => {
-                console.log(label, {
-                    [property]: JSON.parse(JSON.stringify(value)),
-                });
-            },
-            { deep: true },
-        );
-    }
-}
-
-export function useDebugReactiveProp<T extends Record<string, unknown>>(
-    reactiveState: T,
-    property: keyof T,
-    label: string = 'useDebugReactiveProp:',
-) {
-    watch(
-        () => reactiveState[property],
-        (value) => {
-            console.log(label, {
-                [property]: JSON.parse(JSON.stringify(value)),
-            });
+    watchEffect(
+        () => {
+            // `JSON.stringify` deeply accesses every property in the reactive object, causing Vue to track all of them as dependencies
+            JSON.stringify(reactiveState);
         },
-        { deep: true },
+        {
+            // `key` refers to the property accessed on/within `reactiveState`
+            // Do not confuse this with the key code that triggers an event
+            // Only active in dev environment - no-op in production
+            onTrigger(e) {
+                console.log(label, { [e.key as string]: e.newValue });
+            },
+        },
     );
 }
