@@ -25,9 +25,11 @@ export interface TanstackField<
 }
 
 export interface TanstackArrayField<
-    TState = string[],
+    TItem = string,
+    TState = TItem[],
 > extends TanstackBaseField<TState> {
     pushValue(arg: any): void;
+    replaceValue(index: number, arg: any): void;
     removeValue(index: number, options?: UpdateMetaOptions): void;
 }
 

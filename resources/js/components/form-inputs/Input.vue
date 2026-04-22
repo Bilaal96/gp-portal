@@ -26,7 +26,7 @@
     - must manually parse string value to int & handle NaN results
  */
 
-import { computed, type InputHTMLAttributes } from 'vue';
+import { computed, useTemplateRef, type InputHTMLAttributes } from 'vue';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
@@ -38,6 +38,9 @@ const props = defineProps<
     }
 >();
 defineEmits(['input']);
+
+const inputRef = useTemplateRef('input');
+defineExpose({ input: inputRef });
 
 // Required to get around known TS error caused when destructuring from large types such as InputHTMLAttributes
 const inputProps = computed<InputHTMLAttributes>(() => {
@@ -69,6 +72,7 @@ const inputProps = computed<InputHTMLAttributes>(() => {
         >
 
         <input
+            ref="input"
             v-bind="{ ...inputProps, ...$attrs }"
             @input="$emit('input', $event)"
             data-slot="input"
