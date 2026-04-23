@@ -93,11 +93,11 @@ export const defaultValues = {
             undefined as FormTypes['previousMedicalRecords']['isVeteran'],
     },
     healthOverview: {
-        hasLongTermCondition:
-            undefined as FormTypes['healthOverview']['hasLongTermCondition'],
         longTermConditions:
             [] as FormTypes['healthOverview']['longTermConditions'],
-        majorIncidents: [] as FormTypes['healthOverview']['majorIncidents'],
+        majorIncidents: [
+            { title: 'test', reason: 'test', details: 'test' },
+        ] as FormTypes['healthOverview']['majorIncidents'],
         isUnderSpecialistCare: undefined,
     },
 };

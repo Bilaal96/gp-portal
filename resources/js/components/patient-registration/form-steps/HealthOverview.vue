@@ -43,6 +43,10 @@ import type { TanstackArrayField } from '@/types';
 
 const props = defineProps<FormStepProps>();
 
+// Conditionally renders longTermConditions MultiSelectCombobox field
+const hasLongTermConditions = ref<boolean | undefined>(undefined);
+
+// Handles state for majorIncident draft fields
 const majorIncident = reactive({
     showFormFields: true,
     editIndex: null as number | null,
@@ -56,6 +60,7 @@ const majorIncident = reactive({
 // Controls Accordion state for logged incidents
 const loggedIncidentsAccordion = ref<string | string[] | undefined>(undefined);
 
+// Used to manually focus input
 const incidentTitleInput = useTemplateRef('incident-title');
 
 // REVIEW: should I replace constraints with explicit Draftable interface
@@ -169,12 +174,6 @@ function deleteMajorIncident(
     field.removeValue(incidentIndex);
 }
 
-// REVIEW: should I refactor to use reactive local state - will be more concise
-// Used to conditionally render other fields
-const hasLongTermConditions = props.form.useStore(
-    (state) => state.values.healthOverview.hasLongTermCondition,
-);
-
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
 useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
 useDebugReactive(majorIncident, '[reactive] majorIncidents:');
@@ -187,20 +186,20 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
         <!-- All Questions -->
         <div class="space-y-4">
             <!-- RadioGroup (binary) - Do you have any long-term medical conditions? -->
-            <form.Field
-                name="healthOverview.hasLongTermCondition"
-                v-slot="{ field }"
-            >
-                <RadioGroup
-                    id="has-long-term-condition"
-                    prompt="Do you have any long-term medical conditions?"
-                    :options="binaryRadioGroup()"
-                    @change="
-                        (value) =>
-                            field.handleChange(value === 'yes' ? true : false)
-                    "
-                />
-            </form.Field>
+            <RadioGroup
+                id="has-long-term-condition"
+                prompt="Do you have any long-term medical conditions?"
+                :options="binaryRadioGroup()"
+                @change="
+                    (value) => {
+                        if (value === 'yes') {
+                            hasLongTermConditions = true;
+                        } else {
+                            hasLongTermConditions = false;
+                        }
+                    }
+                "
+            />
 
             <!-- MultiSelectCombobox - Specify long-term medical conditions -->
             <form.Field

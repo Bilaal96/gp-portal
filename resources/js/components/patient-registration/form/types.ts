@@ -50,7 +50,6 @@ export interface FormTypes {
         isVeteran: boolean | undefined;
     };
     healthOverview: {
-        hasLongTermCondition: boolean | undefined;
         longTermConditions: string[];
         majorIncidents: { title: string; reason: string; details: string }[];
     };
