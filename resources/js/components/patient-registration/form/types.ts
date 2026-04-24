@@ -52,6 +52,8 @@ export interface FormTypes {
     healthOverview: {
         longTermConditions: string[];
         majorIncidents: { title: string; reason: string; details: string }[];
+        isUnderSpecialistCare: boolean | undefined;
+        medication: { name: string; dosage: string; purpose: string }[];
     };
 }
 

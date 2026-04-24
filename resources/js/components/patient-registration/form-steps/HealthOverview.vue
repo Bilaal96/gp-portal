@@ -15,7 +15,6 @@ import {
     Textarea,
 } from '@/components/form-inputs';
 import { binaryRadioGroup } from '@/components/form-inputs/radio-group/utils';
-import { getTextFieldProps } from '@/components/form-inputs/utils';
 import { type FormStepProps } from '@/components/patient-registration/form-steps';
 
 import {
@@ -48,7 +47,7 @@ const hasLongTermConditions = ref<boolean | undefined>(undefined);
 
 // Handles state for majorIncident draft fields
 const majorIncident = reactive({
-    showFormFields: true,
+    showFormFields: false,
     editIndex: null as number | null,
     draft: {
         title: '',
@@ -57,11 +56,23 @@ const majorIncident = reactive({
     },
 });
 
+const medication = reactive({
+    showFormFields: false,
+    editIndex: null as number | null,
+    draft: {
+        name: '',
+        dosage: '',
+        purpose: '',
+    },
+});
+
 // Controls Accordion state for logged incidents
 const loggedIncidentsAccordion = ref<string | string[] | undefined>(undefined);
+const medicationRecordAccordion = ref<string | string[] | undefined>(undefined);
 
 // Used to manually focus input
 const incidentTitleInput = useTemplateRef('incident-title');
+const medicationNameInput = useTemplateRef('medication-name');
 
 // REVIEW: should I replace constraints with explicit Draftable interface
 function setEditMode<T extends { editIndex: number | null }>(
@@ -78,7 +89,7 @@ function showDraftFields<T extends { showFormFields: boolean }>(
     state.showFormFields = show;
 }
 
-function resetDraftFields<T extends { draft: Record<string, string> }>(
+function clearDraftFields<T extends { draft: Record<string, string> }>(
     state: T,
 ) {
     for (const fieldName in state.draft) {
@@ -86,18 +97,28 @@ function resetDraftFields<T extends { draft: Record<string, string> }>(
     }
 }
 
-function resetMajorIncidentFields() {
-    resetDraftFields(majorIncident);
-    showDraftFields(majorIncident, false);
-    if (majorIncident.editIndex !== null) setEditMode(majorIncident, null);
-}
-
+// Expand / retract accordions
 function showLoggedIncidents(show: boolean = true) {
     if (show) {
         loggedIncidentsAccordion.value = 'logged-incidents';
     } else {
         loggedIncidentsAccordion.value = undefined;
     }
+}
+
+function showMedicationRecord(show: boolean = true) {
+    if (show) {
+        medicationRecordAccordion.value = 'listed-medication';
+    } else {
+        medicationRecordAccordion.value = undefined;
+    }
+}
+
+/* ------------------ Handle Draft Fields: Major Incidents ------------------ */
+function resetMajorIncidentFields() {
+    clearDraftFields(majorIncident);
+    showDraftFields(majorIncident, false);
+    if (majorIncident.editIndex !== null) setEditMode(majorIncident, null);
 }
 
 function logMajorIncident(
@@ -138,7 +159,7 @@ async function showEditMajorIncidentView(
     incidentTitleInput.value?.input?.focus();
 }
 
-function editMajorIncident(
+function updateMajorIncident(
     field: TanstackArrayField<typeof majorIncident.draft>,
 ) {
     const {
@@ -172,6 +193,87 @@ function deleteMajorIncident(
     }
 
     field.removeValue(incidentIndex);
+}
+
+/* --------------------- Handle Draft Fields: Medication -------------------- */
+function resetMedicationFields() {
+    clearDraftFields(medication);
+    showDraftFields(medication, false);
+    if (medication.editIndex !== null) setEditMode(medication, null);
+}
+
+function addMedicationEntry(
+    field: TanstackArrayField<typeof medication.draft>,
+) {
+    const { name, dosage, purpose } = medication.draft;
+
+    if (name && dosage && purpose) {
+        // Add Entry
+        field.pushValue({
+            name,
+            dosage,
+            purpose,
+        });
+        resetMedicationFields();
+        showMedicationRecord();
+    } else {
+        // Reject Entry
+        // TODO user input validation/feedback
+        console.warn('Medication: must fill in all fields');
+    }
+}
+
+async function showEditMedicationEntryView(
+    medicationEntry: typeof medication.draft,
+    medicationEntryIndex: number,
+) {
+    setEditMode(medication, medicationEntryIndex);
+
+    // Set draft input values
+    medication.draft.name = medicationEntry.name;
+    medication.draft.dosage = medicationEntry.dosage;
+    medication.draft.purpose = medicationEntry.purpose;
+    medication.showFormFields = true;
+
+    // Focus name input
+    await nextTick(); // Ensures the input exists in DOM
+    medicationNameInput.value?.input?.focus();
+}
+
+function updateMedicationEntry(
+    field: TanstackArrayField<typeof medication.draft>,
+) {
+    const {
+        draft: { name, dosage, purpose },
+        editIndex,
+    } = medication;
+
+    if (name && dosage && purpose && editIndex !== null) {
+        // Edit Entry
+        field.replaceValue(editIndex, {
+            name,
+            dosage,
+            purpose,
+        });
+        resetMedicationFields();
+        showMedicationRecord();
+    } else {
+        // Reject Edit
+        // TODO user input validation/feedback
+        console.warn('Medication: must fill in all fields');
+    }
+}
+
+function deleteMedicationEntry(
+    field: TanstackArrayField<typeof medication.draft>,
+    medicationEntryIndex: number,
+) {
+    // Exit edit mode
+    if (medication.editIndex === medicationEntryIndex) {
+        resetMedicationFields();
+    }
+
+    field.removeValue(medicationEntryIndex);
 }
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
@@ -347,7 +449,7 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
                             class="size-fit cursor-pointer py-1"
                             type="button"
                             size="sm"
-                            @click.prevent.stop="editMajorIncident(field)"
+                            @click.prevent.stop="updateMajorIncident(field)"
                         >
                             <SaveIcon />
                             <span>Save</span>
@@ -472,44 +574,227 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
             <Separator class="my-4" />
 
             <!-- RadioGroup (binary) - Are you currently under the care of a hospital specialist? -->
-
-            <!-- RadioGroup (binary) - Are you currently taking any medication? 
-                - if yes, render array field (as below) 
-            -->
-
-            <!-- Array Field - Medicine & Dosage
-                - If previous answer is yes, render:
-                    * array field with separate inputs for: medicine & dosage
-                    * button -> dynamically add a set of inputs to the field array
-            -->
-
-            <Separator class="my-4" />
-
-            <!-- RadioGroup (binary) - Do you have any allergies?
-                - if yes, render array field (as below) 
-            -->
-
-            <!-- Array Field - Substance & Reaction/Symptoms
-                - If previous answer is yes, render:
-                    * array field with separate inputs for: Substance & Reaction/Symptoms
-                    * button -> dynamically add a set of inputs to the field array
-            -->
-
-            <!-- ! Inputs for reference -->
-            <Separator class="my-4" />
-
             <form.Field
-                name="previousMedicalRecords.previousGP.address1"
+                name="healthOverview.isUnderSpecialistCare"
                 v-slot="{ field }"
             >
-                <Input
-                    class="max-w-sm"
-                    placeholder="Address Line 1"
-                    label="Might Delete Later"
-                    id="prev-gp-address-line-1"
-                    v-bind="getTextFieldProps(field)"
-                    required
+                <RadioGroup
+                    id="is-under-specialist-care"
+                    prompt="Are you currently under the care of a hospital specialist?"
+                    :options="binaryRadioGroup()"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
                 />
+            </form.Field>
+
+            <Separator class="my-4" />
+
+            <!-- Array field - Medication, Dosage & Purpose
+             
+                Are you currently taking any medication? This includes oral & topical medicine for short & long term conditions, as well as allergy treatment.
+                - Add Medication button - reveals draft form (like majorIncidents - see above)
+
+                Operations
+                - Draft form 
+                    - submission - adds to array field: medicationAndDosage
+                    - cancel - clears & hides the form
+
+                    Fields
+                    - Name of Medication
+                    - Dosage
+                    - Purpose (aka Indication) - provide symptoms
+
+
+                - Accordion & Table
+                    - reveal on submission of new entry
+                    - display entries for medication & dosages
+                    - allow edit & deletion of entries
+            -->
+            <p class="mb-4 ml-1 text-sm font-bold">
+                Are you currently taking any medication? This includes oral &
+                topical medicine for short & long term conditions, as well as
+                allergy treatment.
+            </p>
+            <Button
+                v-if="medication.showFormFields === false"
+                class="ml-2 size-fit py-1"
+                type="button"
+                @click.prevent.stop="medication.showFormFields = true"
+            >
+                <PlusCircleIcon />
+                <span>Medication</span>
+            </Button>
+
+            <form.Field name="healthOverview.medication" v-slot="{ field }">
+                <template v-if="medication.showFormFields">
+                    <div class="space-y-4">
+                        <!-- Name -->
+                        <Input
+                            ref="medication-name"
+                            class="max-w-sm"
+                            label="Name of Medicine"
+                            id="medication-name"
+                            name="medication-name"
+                            :value="medication.draft.name"
+                            @input="medication.draft.name = $event.target.value"
+                        />
+
+                        <!-- Dosage -->
+                        <Input
+                            class="max-w-sm"
+                            label="Dosage (include units)"
+                            placeholder="e.g. 500mg"
+                            id="medication-dosage"
+                            name="medication-dosage"
+                            :value="medication.draft.dosage"
+                            @input="
+                                medication.draft.dosage = $event.target.value
+                            "
+                        />
+
+                        <!-- Purpose -->
+                        <Textarea
+                            class="min-h-24 max-w-sm"
+                            label="Purpose"
+                            placeholder="What diagnoses or symptoms are being treated?"
+                            id="medication-purpose"
+                            name="medication-purpose"
+                            :value="medication.draft.purpose"
+                            @input="
+                                medication.draft.purpose = $event.target.value
+                            "
+                        />
+                    </div>
+
+                    <div class="ml-2 flex items-center gap-2">
+                        <Button
+                            v-if="medication.editIndex !== null"
+                            class="size-fit cursor-pointer py-1"
+                            type="button"
+                            size="sm"
+                            @click.prevent.stop="updateMedicationEntry(field)"
+                        >
+                            <SaveIcon />
+                            <span>Save</span>
+                        </Button>
+                        <Button
+                            v-else
+                            class="size-fit cursor-pointer py-1"
+                            type="button"
+                            size="sm"
+                            @click.prevent.stop="addMedicationEntry(field)"
+                        >
+                            <PlusCircleIcon />
+                            <span>Record Medication</span>
+                        </Button>
+
+                        <Button
+                            class="size-fit cursor-pointer py-1"
+                            variant="destructive"
+                            type="button"
+                            size="sm"
+                            @click.prevent.stop="resetMedicationFields()"
+                        >
+                            <span>Cancel</span>
+                        </Button>
+                    </div>
+                </template>
+
+                <Accordion
+                    collapsible
+                    v-model="medicationRecordAccordion"
+                    v-slot="{ modelValue }"
+                >
+                    <AccordionItem value="listed-medication">
+                        <AccordionTrigger
+                            :class="
+                                cn('mb-1 bg-primary/30 px-4', {
+                                    'text-muted-foreground':
+                                        modelValue === 'listed-medication',
+                                })
+                            "
+                        >
+                            Medication Record
+                        </AccordionTrigger>
+                        <AccordionContent class="rounded-md bg-primary/10">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Dosage</TableHead>
+                                        <TableHead>Purpose</TableHead>
+                                        <TableHead class="text-right">
+                                            Actions
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+
+                                <!-- Listed Medication -->
+                                <TableBody v-if="field.state.value.length">
+                                    <TableRow
+                                        v-for="(
+                                            medicationEntry,
+                                            medicationEntryIndex
+                                        ) in field.state.value"
+                                        :key="medicationEntryIndex"
+                                    >
+                                        <TableCell>
+                                            {{ medicationEntry.name }}
+                                        </TableCell>
+                                        <TableCell>
+                                            {{ medicationEntry.dosage }}
+                                        </TableCell>
+                                        <TableCell>
+                                            {{ medicationEntry.purpose }}
+                                        </TableCell>
+                                        <TableCell
+                                            class="align-right flex flex-wrap justify-end gap-2"
+                                        >
+                                            <EditIcon
+                                                v-if="
+                                                    medicationEntryIndex !==
+                                                    medication.editIndex
+                                                "
+                                                class="cursor-pointer transition-colors hover:text-secondary"
+                                                :size="16"
+                                                @click="
+                                                    showEditMedicationEntryView(
+                                                        medicationEntry,
+                                                        medicationEntryIndex,
+                                                    )
+                                                "
+                                            />
+                                            <Trash2Icon
+                                                class="cursor-pointer transition-colors hover:text-red-700"
+                                                :size="16"
+                                                @click="
+                                                    deleteMedicationEntry(
+                                                        field,
+                                                        medicationEntryIndex,
+                                                    )
+                                                "
+                                            />
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+
+                                <!-- No Medication Listed (empty table) -->
+                                <TableBody v-else>
+                                    <TableRow>
+                                        <TableCell
+                                            colspan="4"
+                                            class="h-20 text-center"
+                                        >
+                                            No medication recorded
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             </form.Field>
         </div>
     </div>

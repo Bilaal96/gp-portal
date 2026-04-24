@@ -95,10 +95,10 @@ export const defaultValues = {
     healthOverview: {
         longTermConditions:
             [] as FormTypes['healthOverview']['longTermConditions'],
-        majorIncidents: [
-            { title: 'test', reason: 'test', details: 'test' },
-        ] as FormTypes['healthOverview']['majorIncidents'],
-        isUnderSpecialistCare: undefined,
+        majorIncidents: [] as FormTypes['healthOverview']['majorIncidents'],
+        isUnderSpecialistCare:
+            undefined as FormTypes['healthOverview']['isUnderSpecialistCare'],
+        medication: [] as FormTypes['healthOverview']['medication'],
     },
 };
 
