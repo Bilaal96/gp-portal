@@ -68,25 +68,8 @@ const incidentTitleInput = useTemplateRef('incident-title');
 const medicationNameInput = useTemplateRef('medication-name');
 
 // Controls Accordion state for logged incidents
-const loggedIncidentsAccordion = ref<string | string[] | undefined>(undefined);
-const medicationRecordAccordion = ref<string | string[] | undefined>(undefined);
-
-// Expand / retract accordions
-function showLoggedIncidents(show: boolean = true) {
-    if (show) {
-        loggedIncidentsAccordion.value = 'logged-incidents';
-    } else {
-        loggedIncidentsAccordion.value = undefined;
-    }
-}
-
-function showMedicationRecord(show: boolean = true) {
-    if (show) {
-        medicationRecordAccordion.value = 'listed-medication';
-    } else {
-        medicationRecordAccordion.value = undefined;
-    }
-}
+const loggedIncidentsAccordion = ref<'show-incidents' | undefined>(undefined);
+const medicationRecordAccordion = ref<'show-medication' | undefined>(undefined);
 
 /* ------------------ Handle Draft Fields: Major Incidents ------------------ */
 function logMajorIncident(
@@ -102,7 +85,7 @@ function logMajorIncident(
             details,
         });
         majorIncidentDraft.resetDraftFields();
-        showLoggedIncidents();
+        loggedIncidentsAccordion.value = 'show-incidents';
     } else {
         // Reject Log
         // TODO user input validation/feedback
@@ -135,7 +118,7 @@ function updateMajorIncident(
             details,
         });
         majorIncidentDraft.resetDraftFields();
-        showLoggedIncidents();
+        loggedIncidentsAccordion.value = 'show-incidents';
     } else {
         // Reject Edit
         // TODO user input validation/feedback
@@ -169,7 +152,7 @@ function addMedicationEntry(
             purpose,
         });
         medicationDraft.resetDraftFields();
-        showMedicationRecord();
+        medicationRecordAccordion.value = 'show-medication';
     } else {
         // Reject Entry
         // TODO user input validation/feedback
@@ -202,7 +185,7 @@ function updateMedicationEntry(
             purpose,
         });
         medicationDraft.resetDraftFields();
-        showMedicationRecord();
+        medicationRecordAccordion.value = 'show-medication';
     } else {
         // Reject Edit
         // TODO user input validation/feedback
@@ -435,7 +418,7 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
                     v-model="loggedIncidentsAccordion"
                     v-slot="{ modelValue }"
                 >
-                    <AccordionItem value="logged-incidents">
+                    <AccordionItem value="show-incidents">
                         <AccordionTrigger
                             :class="
                                 cn('mb-1 bg-primary/30 px-4', {
@@ -672,7 +655,7 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
                     v-model="medicationRecordAccordion"
                     v-slot="{ modelValue }"
                 >
-                    <AccordionItem value="listed-medication">
+                    <AccordionItem value="show-medication">
                         <AccordionTrigger
                             :class="
                                 cn('mb-1 bg-primary/30 px-4', {
