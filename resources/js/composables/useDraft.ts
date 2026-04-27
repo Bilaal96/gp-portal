@@ -1,0 +1,66 @@
+import { ref } from 'vue';
+
+/** 
+ * Form state
+ * -- add draft to form state
+ * -- edit form state - depends on draft state's editIndex
+ * -- remove from form state - depends on draft state's editIndex
+ 
+ * Draft hook - determine when to show/hide draft view
+ * -- Show the edit view (i.e. set edit mode)
+ * -- clear edit view fields
+ * -- reset edit view (i.e. exit edit mode) 
+    -- clear & hide fields
+    -- reset editIndex to null
+ 
+ * TODO extend to support validation & UI feedback (e.g. error messages)
+ */
+export default function useDraft<TState extends Record<string, string>>(
+    draftState: TState,
+) {
+    const editIndex = ref<number | null>(null);
+    const draft = ref<TState>({ ...draftState });
+    const showDraftFields = ref(false);
+
+    function isEditing() {
+        return editIndex.value !== null;
+    }
+
+    function showEditView(newEditIndex: number, valuesToEdit: TState) {
+        editIndex.value = newEditIndex;
+
+        // Populate draft state with valuesToEdit
+        for (const fieldName in draft.value) {
+            draft.value[fieldName] = valuesToEdit[fieldName];
+        }
+
+        showDraftFields.value = true;
+
+        // Focus the first draft input within the component - that logic doesn't belong here
+    }
+
+    function clearDraftFields() {
+        for (const fieldName in draft.value) {
+            draft.value[fieldName] = '';
+        }
+    }
+
+    function resetDraftFields() {
+        clearDraftFields();
+        showDraftFields.value = false;
+
+        if (isEditing()) editIndex.value = null;
+    }
+
+    return {
+        editIndex,
+        draft,
+        showDraftFields,
+        isEditing,
+
+        // main functionality composed of the above
+        showEditView,
+        clearDraftFields,
+        resetDraftFields,
+    };
+}
