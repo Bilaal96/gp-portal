@@ -22,8 +22,14 @@ export default function useDraft<TState extends Record<string, string>>(
     const draft = ref<TState>({ ...draftState });
     const showDraftFields = ref(false);
 
-    function isEditing() {
-        return editIndex.value !== null;
+    /**
+     * Determine if the draft is in edit mode.
+     *
+     * **NOTE:** An `index` argument must be provided when trying to narrow `editIndex.value` from `number | null` to `number`.
+     * Without the `index` argument, it will simply return a `boolean`.
+     */
+    function isEditing(index = editIndex.value): index is number {
+        return index !== null;
     }
 
     function showEditView(newEditIndex: number, valuesToEdit: TState) {
