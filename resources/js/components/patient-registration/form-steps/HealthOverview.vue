@@ -6,7 +6,7 @@ import {
     SaveIcon,
     Trash2Icon,
 } from 'lucide-vue-next';
-import { reactive, ref, nextTick, useTemplateRef } from 'vue';
+import { ref, nextTick, useTemplateRef } from 'vue';
 import BadgeList from '@/components/BadgeList.vue';
 import {
     Input,
@@ -35,7 +35,6 @@ import {
 } from '@/components/ui/table';
 
 import { useDebugForm } from '@/composables/useDebugForm';
-import { useDebugReactive } from '@/composables/useDebugReactive';
 import useDraft from '@/composables/useDraft';
 import { LONG_TERM_HEALTH_CONDITIONS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -46,52 +45,31 @@ const props = defineProps<FormStepProps>();
 // Conditionally renders longTermConditions MultiSelectCombobox field
 const hasLongTermConditions = ref<boolean | undefined>(undefined);
 
-const majorIncidentDraft = useDraft({
-    title: '',
-    reason: '',
-    details: '',
-});
+const majorIncidentDraft = useDraft(
+    {
+        title: '',
+        reason: '',
+        details: '',
+    },
+    'majorIncident',
+);
 
-const medication = reactive({
-    showFormFields: false,
-    editIndex: null as number | null,
-    draft: {
+const medicationDraft = useDraft(
+    {
         name: '',
         dosage: '',
         purpose: '',
     },
-});
+    'medication',
+);
+
+// Used to manually focus first draft field when entering edit mode
+const incidentTitleInput = useTemplateRef('incident-title');
+const medicationNameInput = useTemplateRef('medication-name');
 
 // Controls Accordion state for logged incidents
 const loggedIncidentsAccordion = ref<string | string[] | undefined>(undefined);
 const medicationRecordAccordion = ref<string | string[] | undefined>(undefined);
-
-// Used to manually focus input
-const incidentTitleInput = useTemplateRef('incident-title');
-const medicationNameInput = useTemplateRef('medication-name');
-
-// REVIEW: should I replace constraints with explicit Draftable interface
-function setEditMode<T extends { editIndex: number | null }>(
-    state: T,
-    editIndex: number | null,
-) {
-    state.editIndex = editIndex;
-}
-
-function showDraftFields<T extends { showFormFields: boolean }>(
-    state: T,
-    show: boolean = true,
-) {
-    state.showFormFields = show;
-}
-
-function clearDraftFields<T extends { draft: Record<string, string> }>(
-    state: T,
-) {
-    for (const fieldName in state.draft) {
-        state.draft[fieldName] = '';
-    }
-}
 
 // Expand / retract accordions
 function showLoggedIncidents(show: boolean = true) {
@@ -111,12 +89,6 @@ function showMedicationRecord(show: boolean = true) {
 }
 
 /* ------------------ Handle Draft Fields: Major Incidents ------------------ */
-/* function resetMajorIncidentFields() {
-    clearDraftFields(majorIncident);
-    showDraftFields(majorIncident, false);
-    if (majorIncident.editIndex !== null) setEditMode(majorIncident, null);
-} */
-
 function logMajorIncident(
     field: TanstackArrayField<typeof majorIncidentDraft.draft.value>,
 ) {
@@ -155,9 +127,9 @@ function updateMajorIncident(
     const { title, reason, details } = majorIncidentDraft.draft.value;
     const { isEditing, editIndex } = majorIncidentDraft;
 
-    if (title && reason && details && isEditing()) {
+    if (title && reason && details && isEditing(editIndex.value)) {
         // Edit Log
-        field.replaceValue(editIndex.value as number, {
+        field.replaceValue(editIndex.value, {
             title,
             reason,
             details,
@@ -184,16 +156,10 @@ function deleteMajorIncident(
 }
 
 /* --------------------- Handle Draft Fields: Medication -------------------- */
-function resetMedicationFields() {
-    clearDraftFields(medication);
-    showDraftFields(medication, false);
-    if (medication.editIndex !== null) setEditMode(medication, null);
-}
-
 function addMedicationEntry(
-    field: TanstackArrayField<typeof medication.draft>,
+    field: TanstackArrayField<typeof medicationDraft.draft.value>,
 ) {
-    const { name, dosage, purpose } = medication.draft;
+    const { name, dosage, purpose } = medicationDraft.draft.value;
 
     if (name && dosage && purpose) {
         // Add Entry
@@ -202,7 +168,7 @@ function addMedicationEntry(
             dosage,
             purpose,
         });
-        resetMedicationFields();
+        medicationDraft.resetDraftFields();
         showMedicationRecord();
     } else {
         // Reject Entry
@@ -212,16 +178,10 @@ function addMedicationEntry(
 }
 
 async function showEditMedicationEntryView(
-    medicationEntry: typeof medication.draft,
     medicationEntryIndex: number,
+    medicationEntry: typeof medicationDraft.draft.value,
 ) {
-    setEditMode(medication, medicationEntryIndex);
-
-    // Set draft input values
-    medication.draft.name = medicationEntry.name;
-    medication.draft.dosage = medicationEntry.dosage;
-    medication.draft.purpose = medicationEntry.purpose;
-    medication.showFormFields = true;
+    medicationDraft.showEditView(medicationEntryIndex, medicationEntry);
 
     // Focus name input
     await nextTick(); // Ensures the input exists in DOM
@@ -229,21 +189,19 @@ async function showEditMedicationEntryView(
 }
 
 function updateMedicationEntry(
-    field: TanstackArrayField<typeof medication.draft>,
+    field: TanstackArrayField<typeof medicationDraft.draft.value>,
 ) {
-    const {
-        draft: { name, dosage, purpose },
-        editIndex,
-    } = medication;
+    const { name, dosage, purpose } = medicationDraft.draft.value;
+    const { editIndex, isEditing } = medicationDraft;
 
-    if (name && dosage && purpose && editIndex !== null) {
+    if (name && dosage && purpose && isEditing(editIndex.value)) {
         // Edit Entry
-        field.replaceValue(editIndex, {
+        field.replaceValue(editIndex.value, {
             name,
             dosage,
             purpose,
         });
-        resetMedicationFields();
+        medicationDraft.resetDraftFields();
         showMedicationRecord();
     } else {
         // Reject Edit
@@ -253,12 +211,12 @@ function updateMedicationEntry(
 }
 
 function deleteMedicationEntry(
-    field: TanstackArrayField<typeof medication.draft>,
+    field: TanstackArrayField<typeof medicationDraft.draft.value>,
     medicationEntryIndex: number,
 ) {
-    // Exit edit mode
-    if (medication.editIndex === medicationEntryIndex) {
-        resetMedicationFields();
+    // If item to delete is being edited, exit edit mode
+    if (medicationDraft.editIndex.value === medicationEntryIndex) {
+        medicationDraft.resetDraftFields();
     }
 
     field.removeValue(medicationEntryIndex);
@@ -266,7 +224,6 @@ function deleteMedicationEntry(
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
 useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
-useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
 </script>
 
 <template>
@@ -436,6 +393,7 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                         />
                     </div>
                     <div class="ml-2 flex items-center gap-2">
+                        <!-- Save Edit -->
                         <Button
                             v-if="majorIncidentDraft.isEditing()"
                             class="size-fit cursor-pointer py-1"
@@ -446,6 +404,7 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                             <SaveIcon />
                             <span>Save</span>
                         </Button>
+                        <!-- or Add New Incident -->
                         <Button
                             v-else
                             class="size-fit cursor-pointer py-1"
@@ -613,17 +572,19 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                 allergy treatment.
             </p>
             <Button
-                v-if="medication.showFormFields === false"
+                v-if="medicationDraft.showDraftFields.value === false"
                 class="ml-2 size-fit py-1"
                 type="button"
-                @click.prevent.stop="medication.showFormFields = true"
+                @click.prevent.stop="
+                    medicationDraft.showDraftFields.value = true
+                "
             >
                 <PlusCircleIcon />
                 <span>Medication</span>
             </Button>
 
             <form.Field name="healthOverview.medication" v-slot="{ field }">
-                <template v-if="medication.showFormFields">
+                <template v-if="medicationDraft.showDraftFields.value">
                     <div class="space-y-4">
                         <!-- Name -->
                         <Input
@@ -632,8 +593,11 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                             label="Name of Medicine"
                             id="medication-name"
                             name="medication-name"
-                            :value="medication.draft.name"
-                            @input="medication.draft.name = $event.target.value"
+                            :value="medicationDraft.draft.value.name"
+                            @input="
+                                medicationDraft.draft.value.name =
+                                    $event.target.value
+                            "
                         />
 
                         <!-- Dosage -->
@@ -643,9 +607,10 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                             placeholder="e.g. 500mg"
                             id="medication-dosage"
                             name="medication-dosage"
-                            :value="medication.draft.dosage"
+                            :value="medicationDraft.draft.value.dosage"
                             @input="
-                                medication.draft.dosage = $event.target.value
+                                medicationDraft.draft.value.dosage =
+                                    $event.target.value
                             "
                         />
 
@@ -656,16 +621,18 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                             placeholder="What diagnoses or symptoms are being treated?"
                             id="medication-purpose"
                             name="medication-purpose"
-                            :value="medication.draft.purpose"
+                            :value="medicationDraft.draft.value.purpose"
                             @input="
-                                medication.draft.purpose = $event.target.value
+                                medicationDraft.draft.value.purpose =
+                                    $event.target.value
                             "
                         />
                     </div>
 
                     <div class="ml-2 flex items-center gap-2">
+                        <!-- Save Edit -->
                         <Button
-                            v-if="medication.editIndex !== null"
+                            v-if="medicationDraft.isEditing()"
                             class="size-fit cursor-pointer py-1"
                             type="button"
                             size="sm"
@@ -674,6 +641,7 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                             <SaveIcon />
                             <span>Save</span>
                         </Button>
+                        <!-- or Add New Medication -->
                         <Button
                             v-else
                             class="size-fit cursor-pointer py-1"
@@ -690,7 +658,9 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                             variant="destructive"
                             type="button"
                             size="sm"
-                            @click.prevent.stop="resetMedicationFields()"
+                            @click.prevent.stop="
+                                medicationDraft.resetDraftFields()
+                            "
                         >
                             <span>Cancel</span>
                         </Button>
@@ -750,14 +720,15 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                                             <EditIcon
                                                 v-if="
                                                     medicationEntryIndex !==
-                                                    medication.editIndex
+                                                    medicationDraft.editIndex
+                                                        .value
                                                 "
                                                 class="cursor-pointer transition-colors hover:text-secondary"
                                                 :size="16"
                                                 @click="
                                                     showEditMedicationEntryView(
-                                                        medicationEntry,
                                                         medicationEntryIndex,
+                                                        medicationEntry,
                                                     )
                                                 "
                                             />
