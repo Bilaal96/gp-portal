@@ -36,6 +36,7 @@ import {
 
 import { useDebugForm } from '@/composables/useDebugForm';
 import { useDebugReactive } from '@/composables/useDebugReactive';
+import useDraft from '@/composables/useDraft';
 import { LONG_TERM_HEALTH_CONDITIONS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import type { TanstackArrayField } from '@/types';
@@ -45,15 +46,10 @@ const props = defineProps<FormStepProps>();
 // Conditionally renders longTermConditions MultiSelectCombobox field
 const hasLongTermConditions = ref<boolean | undefined>(undefined);
 
-// Handles state for majorIncident draft fields
-const majorIncident = reactive({
-    showFormFields: false,
-    editIndex: null as number | null,
-    draft: {
-        title: '',
-        reason: '',
-        details: '',
-    },
+const majorIncidentDraft = useDraft({
+    title: '',
+    reason: '',
+    details: '',
 });
 
 const medication = reactive({
@@ -115,16 +111,16 @@ function showMedicationRecord(show: boolean = true) {
 }
 
 /* ------------------ Handle Draft Fields: Major Incidents ------------------ */
-function resetMajorIncidentFields() {
+/* function resetMajorIncidentFields() {
     clearDraftFields(majorIncident);
     showDraftFields(majorIncident, false);
     if (majorIncident.editIndex !== null) setEditMode(majorIncident, null);
-}
+} */
 
 function logMajorIncident(
-    field: TanstackArrayField<typeof majorIncident.draft>,
+    field: TanstackArrayField<typeof majorIncidentDraft.draft.value>,
 ) {
-    const { title, reason, details } = majorIncident.draft;
+    const { title, reason, details } = majorIncidentDraft.draft.value;
 
     if (title && reason && details) {
         // Log
@@ -133,7 +129,7 @@ function logMajorIncident(
             reason,
             details,
         });
-        resetMajorIncidentFields();
+        majorIncidentDraft.resetDraftFields();
         showLoggedIncidents();
     } else {
         // Reject Log
@@ -143,16 +139,10 @@ function logMajorIncident(
 }
 
 async function showEditMajorIncidentView(
-    incident: typeof majorIncident.draft,
     incidentIndex: number,
+    incident: typeof majorIncidentDraft.draft.value,
 ) {
-    setEditMode(majorIncident, incidentIndex);
-
-    // Set draft input values
-    majorIncident.draft.title = incident.title;
-    majorIncident.draft.reason = incident.reason;
-    majorIncident.draft.details = incident.details;
-    majorIncident.showFormFields = true;
+    majorIncidentDraft.showEditView(incidentIndex, incident);
 
     // Focus title input
     await nextTick(); // Ensures the input exists in DOM
@@ -160,21 +150,19 @@ async function showEditMajorIncidentView(
 }
 
 function updateMajorIncident(
-    field: TanstackArrayField<typeof majorIncident.draft>,
+    field: TanstackArrayField<typeof majorIncidentDraft.draft.value>,
 ) {
-    const {
-        draft: { title, reason, details },
-        editIndex,
-    } = majorIncident;
+    const { title, reason, details } = majorIncidentDraft.draft.value;
+    const { isEditing, editIndex } = majorIncidentDraft;
 
-    if (title && reason && details && editIndex !== null) {
+    if (title && reason && details && isEditing()) {
         // Edit Log
-        field.replaceValue(editIndex, {
+        field.replaceValue(editIndex.value as number, {
             title,
             reason,
             details,
         });
-        resetMajorIncidentFields();
+        majorIncidentDraft.resetDraftFields();
         showLoggedIncidents();
     } else {
         // Reject Edit
@@ -184,12 +172,12 @@ function updateMajorIncident(
 }
 
 function deleteMajorIncident(
-    field: TanstackArrayField<typeof majorIncident.draft>,
+    field: TanstackArrayField<typeof majorIncidentDraft.draft.value>,
     incidentIndex: number,
 ) {
-    // Exit edit mode
-    if (majorIncident.editIndex === incidentIndex) {
-        resetMajorIncidentFields();
+    // If item to delete is being edited, exit edit mode
+    if (majorIncidentDraft.editIndex.value === incidentIndex) {
+        majorIncidentDraft.resetDraftFields();
     }
 
     field.removeValue(incidentIndex);
@@ -278,7 +266,7 @@ function deleteMedicationEntry(
 
 // [DEBUG] Reactive state logging for debugging tanstack form input syncing
 useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
-useDebugReactive(majorIncident, '[reactive] majorIncidents:');
+useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
 </script>
 
 <template>
@@ -389,10 +377,12 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
                 have occurred - e.g. major surgeries or hospital admissions.
             </p>
             <Button
-                v-if="majorIncident.showFormFields === false"
+                v-if="majorIncidentDraft.showDraftFields.value === false"
                 class="ml-2 size-fit py-1"
                 type="button"
-                @click.prevent.stop="majorIncident.showFormFields = true"
+                @click.prevent.stop="
+                    majorIncidentDraft.showDraftFields.value = true
+                "
             >
                 <PlusCircleIcon />
                 <span>Incident</span>
@@ -400,7 +390,7 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
 
             <!-- Array Field - majorIncidents -->
             <form.Field name="healthOverview.majorIncidents" v-slot="{ field }">
-                <template v-if="majorIncident.showFormFields">
+                <template v-if="majorIncidentDraft.showDraftFields.value">
                     <div class="space-y-4">
                         <!-- Title -->
                         <Input
@@ -410,9 +400,10 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
                             placeholder="Give a name to the incident"
                             id="incident-title"
                             name="incident-title"
-                            :value="majorIncident.draft.title"
+                            :value="majorIncidentDraft.draft.value.title"
                             @input="
-                                majorIncident.draft.title = $event.target.value
+                                majorIncidentDraft.draft.value.title =
+                                    $event.target.value
                             "
                         />
 
@@ -423,9 +414,10 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
                             placeholder="Brief description of the incident"
                             id="incident-reason"
                             name="incident-reason"
-                            :value="majorIncident.draft.reason"
+                            :value="majorIncidentDraft.draft.value.reason"
                             @input="
-                                majorIncident.draft.reason = $event.target.value
+                                majorIncidentDraft.draft.value.reason =
+                                    $event.target.value
                             "
                         />
 
@@ -436,16 +428,16 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
                             placeholder="Provide additional information..."
                             id="incident-details"
                             name="incident-details"
-                            :value="majorIncident.draft.details"
+                            :value="majorIncidentDraft.draft.value.details"
                             @input="
-                                majorIncident.draft.details =
+                                majorIncidentDraft.draft.value.details =
                                     $event.target.value
                             "
                         />
                     </div>
                     <div class="ml-2 flex items-center gap-2">
                         <Button
-                            v-if="majorIncident.editIndex !== null"
+                            v-if="majorIncidentDraft.editIndex !== null"
                             class="size-fit cursor-pointer py-1"
                             type="button"
                             size="sm"
@@ -470,7 +462,9 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
                             variant="destructive"
                             type="button"
                             size="sm"
-                            @click.prevent.stop="resetMajorIncidentFields()"
+                            @click.prevent.stop="
+                                majorIncidentDraft.resetDraftFields()
+                            "
                         >
                             <span>Cancel</span>
                         </Button>
@@ -529,14 +523,15 @@ useDebugReactive(majorIncident, '[reactive] majorIncidents:');
                                             <EditIcon
                                                 v-if="
                                                     incidentIndex !==
-                                                    majorIncident.editIndex
+                                                    majorIncidentDraft.editIndex
+                                                        .value
                                                 "
                                                 class="cursor-pointer transition-colors hover:text-secondary"
                                                 :size="16"
                                                 @click="
                                                     showEditMajorIncidentView(
-                                                        incident,
                                                         incidentIndex,
+                                                        incident,
                                                     )
                                                 "
                                             />
