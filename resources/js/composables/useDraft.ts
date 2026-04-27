@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 /** 
  * Form state
@@ -17,10 +17,20 @@ import { ref } from 'vue';
  */
 export default function useDraft<TState extends Record<string, string>>(
     draftState: TState,
+    debugLabel?: string | undefined,
 ) {
     const editIndex = ref<number | null>(null);
     const draft = ref<TState>({ ...draftState });
     const showDraftFields = ref(false);
+
+    if (debugLabel) {
+        watch(draft.value, (draft) => {
+            console.log(
+                debugLabel + ' [draft]',
+                JSON.parse(JSON.stringify(draft)),
+            );
+        });
+    }
 
     /**
      * Determine if the draft is in edit mode.
