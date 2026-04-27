@@ -437,7 +437,7 @@ useDebugReactive(majorIncidentDraft, '[reactive] majorIncidents:');
                     </div>
                     <div class="ml-2 flex items-center gap-2">
                         <Button
-                            v-if="majorIncidentDraft.editIndex !== null"
+                            v-if="majorIncidentDraft.isEditing()"
                             class="size-fit cursor-pointer py-1"
                             type="button"
                             size="sm"
