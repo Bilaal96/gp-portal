@@ -56,13 +56,20 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
                 <RadioGroup
                     id="has-fixed-address"
                     prompt="Do you have a fixed address?"
-                    subtext="If you're homeless we will use our clinic as a temporary address. You can change this at any time by getting in touch with us."
                     :options="binaryRadioGroup()"
                     @change="
                         (value) =>
                             field.handleChange(value === 'yes' ? true : false)
                     "
-                />
+                >
+                    <template #subtext>
+                        <p class="text-muted-foreground">
+                            If you're homeless we will use our clinic as a
+                            temporary address. You can change this at any time
+                            by getting in touch with us.
+                        </p>
+                    </template>
+                </RadioGroup>
             </form.Field>
 
             <!-- Fixed address fields - input:text -->

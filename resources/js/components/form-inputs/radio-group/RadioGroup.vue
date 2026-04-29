@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useSlots } from 'vue';
 import { type RadioGroupOptionLiteral } from '@/components/form-inputs/radio-group/utils';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -10,13 +11,14 @@ const props = withDefaults(
         options: RadioGroupOptionLiteral[];
         id?: string;
         defaultValue?: string;
-        subtext?: string;
     }>(),
     { defaultValue: '' },
 );
 
 // Vue docs: Radio buttons typically emit 'change' event
 defineEmits(['change']);
+
+const slots = useSlots();
 </script>
 
 <template>
@@ -25,15 +27,15 @@ defineEmits(['change']);
         <p
             :class="
                 cn('mb-2 text-sm font-bold', {
-                    'mb-3': !subtext || subtext.length === 0,
+                    'mb-3': !slots.subtext,
                 })
             "
         >
             {{ prompt }}
         </p>
-        <p v-if="subtext?.length" class="mb-3 text-xs text-muted-foreground">
-            {{ subtext }}
-        </p>
+        <div v-if="slots.subtext" class="mb-3 text-xs">
+            <slot name="subtext" />
+        </div>
 
         <!-- Possible answers -->
         <div class="ml-2">
