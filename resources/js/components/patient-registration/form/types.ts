@@ -54,6 +54,16 @@ export interface FormTypes {
         majorIncidents: { title: string; reason: string; details: string }[];
         isUnderSpecialistCare: boolean | undefined;
         medication: { name: string; dosage: string; purpose: string }[];
+        height: number;
+        weight: number;
+        exerciseFrequency: boolean | undefined;
+        smokingHistory: string;
+        alcoholConsumption: {
+            frequency: string;
+            quantity: string;
+            bingeFrequency: string;
+        };
+        usesRecreationalDrugs: boolean | undefined;
     };
 }
 

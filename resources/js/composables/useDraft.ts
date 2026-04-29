@@ -14,6 +14,14 @@ import { ref, watch } from 'vue';
     -- reset editIndex to null
  
  * TODO extend to support validation & UI feedback (e.g. error messages)
+ 
+ * Use `options` object as second argument
+    - expose an `isValid()` function
+    - add `validator` option -> a callback function that is called when draft.isValid() is called
+
+ * OR expose a validate() fn that accepts a callback as argument
+    - the callback has access to the draft state
+    - this allows you to define a custom validator wherever you call it
  */
 export default function useDraft<TState extends Record<string, string>>(
     draftState: TState,

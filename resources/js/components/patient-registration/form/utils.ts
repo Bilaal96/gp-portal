@@ -99,6 +99,18 @@ export const defaultValues = {
         isUnderSpecialistCare:
             undefined as FormTypes['healthOverview']['isUnderSpecialistCare'],
         medication: [] as FormTypes['healthOverview']['medication'],
+        height: 0,
+        weight: 0,
+        exerciseFrequency:
+            undefined as FormTypes['healthOverview']['exerciseFrequency'],
+        smokingHistory: '',
+        alcoholConsumption: {
+            frequency: '',
+            quantity: '',
+            bingeFrequency: '',
+        },
+        usesRecreationalDrugs:
+            undefined as FormTypes['healthOverview']['usesRecreationalDrugs'],
     },
 };
 

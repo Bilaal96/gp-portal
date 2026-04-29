@@ -14,7 +14,11 @@ import {
     RadioGroup,
     Textarea,
 } from '@/components/form-inputs';
-import { binaryRadioGroup } from '@/components/form-inputs/radio-group/utils';
+import {
+    binaryRadioGroup,
+    createRadioGroupOptions,
+} from '@/components/form-inputs/radio-group/utils';
+import { getNumberFieldProps } from '@/components/form-inputs/utils';
 import { type FormStepProps } from '@/components/patient-registration/form-steps';
 
 import {
@@ -70,6 +74,11 @@ const medicationNameInput = useTemplateRef('medication-name');
 // Controls Accordion state for logged incidents
 const loggedIncidentsAccordion = ref<'show-incidents' | undefined>(undefined);
 const medicationRecordAccordion = ref<'show-medication' | undefined>(undefined);
+
+// Form state selectors
+const alcoholConsumptionFrequency = props.form.useStore(
+    (state) => state.values.healthOverview.alcoholConsumption.frequency,
+);
 
 /* ------------------ Handle Draft Fields: Major Incidents ------------------ */
 function logMajorIncident(
@@ -744,6 +753,210 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
+            </form.Field>
+
+            <Separator class="my-4" />
+
+            <!-- Number Inputs - Height & Weight -->
+            <form.Field name="healthOverview.height" v-slot="{ field }">
+                <Input
+                    type="number"
+                    class="max-w-max"
+                    label="Height (cm)"
+                    id="height"
+                    v-bind="getNumberFieldProps(field)"
+                    min="0"
+                    required
+                />
+            </form.Field>
+            <form.Field name="healthOverview.weight" v-slot="{ field }">
+                <Input
+                    type="number"
+                    class="max-w-max"
+                    label="Weight (kg)"
+                    id="weight"
+                    v-bind="getNumberFieldProps(field)"
+                    min="0"
+                    required
+                />
+            </form.Field>
+
+            <!-- RadioGroup - Exercise Frequency -->
+            <form.Field
+                name="healthOverview.exerciseFrequency"
+                v-slot="{ field }"
+            >
+                <RadioGroup
+                    id="exercise-frequency-radio-group"
+                    prompt="How often do you exercise per week?"
+                    :options="
+                        createRadioGroupOptions([
+                            {
+                                id: 'never',
+                                label: 'I don\'t exercise',
+                                value: 'never',
+                            },
+                            '1-2 sessions per week',
+                            '3-4 sessions per week',
+                            '5-6 sessions per week',
+                            'daily',
+                        ])
+                    "
+                    @change="(value) => field.handleChange(value)"
+                />
+            </form.Field>
+
+            <Separator class="my-4" />
+
+            <!-- RadioGroup - Do you currently smoke cigarettes or have you smoked in the past? -->
+            <form.Field name="healthOverview.smokingHistory" v-slot="{ field }">
+                <RadioGroup
+                    id="smoking-history-radio-group"
+                    prompt="Do you currently smoke cigarettes or have you smoked in the past?"
+                    :options="
+                        createRadioGroupOptions([
+                            {
+                                id: 'current-smoker',
+                                label: 'I currently smoke cigarettes',
+                                value: 'current smoker',
+                            },
+                            {
+                                id: 'past-smoker',
+                                label: 'I quit smoking cigarettes',
+                                value: 'past smoker',
+                            },
+                            {
+                                id: 'never-smoked',
+                                label: 'I have never smoked cigarettes',
+                                value: 'never smoked',
+                            },
+                        ])
+                    "
+                    @change="(value) => field.handleChange(value)"
+                />
+            </form.Field>
+
+            <Separator class="my-4" />
+
+            <!-- RadioGroup - Drinking frequency (drinks consumed per week) -->
+            <form.Field
+                name="healthOverview.alcoholConsumption.frequency"
+                v-slot="{ field }"
+            >
+                <RadioGroup
+                    id="alcohol-consumption-frequency-radio-group"
+                    prompt="How often do you have a drink containing alcohol?"
+                    :options="
+                        createRadioGroupOptions([
+                            {
+                                id: 'four-or-more-per-week',
+                                label: '4+ times per week',
+                                value: '4 or more per week',
+                            },
+                            {
+                                id: 'three-per-week',
+                                label: '3 times per week',
+                                value: '3 per week',
+                            },
+                            {
+                                id: 'two-per-week',
+                                label: '2 times per week',
+                                value: '2 per week',
+                            },
+                            {
+                                id: 'once-per-week',
+                                label: '1 time per week',
+                                value: '1 per week',
+                            },
+                            'never',
+                        ])
+                    "
+                    @change="(value) => field.handleChange(value)"
+                />
+            </form.Field>
+
+            <template
+                v-if="!['never', ''].includes(alcoholConsumptionFrequency)"
+            >
+                <!-- RadioGroup - drinking quantity - number of drinks consumed on a typical drinking day -->
+                <form.Field
+                    name="healthOverview.alcoholConsumption.quantity"
+                    v-slot="{ field }"
+                >
+                    <RadioGroup
+                        id="alcohol-consumption-quantity-radio-group"
+                        prompt="How many standard drinks do you have on a typical day when you are drinking?"
+                        :options="
+                            createRadioGroupOptions([
+                                '9+ Units',
+                                '7-8 Units',
+                                '5-6 Units',
+                                '3-4 Units',
+                                '1-2 Units',
+                            ])
+                        "
+                        @change="(value) => field.handleChange(value)"
+                    >
+                        <template #subtext>
+                            <p class="mb-1 ml-1 text-muted-foreground">
+                                Please use these guidelines in regards to what
+                                constitutes a "standard drink":
+                            </p>
+                            <ul
+                                class="ml-6 list-disc space-y-1 text-muted-foreground"
+                            >
+                                <li>
+                                    1 Unit/Drink: ½ pint of beer, small glass of
+                                    wine, or a single shot.
+                                </li>
+                                <li>
+                                    2 Units/Drinks: 1 pint of beer or medium
+                                    wine (175ml).
+                                </li>
+                                <li>9 Units/Drinks: A full bottle of wine.</li>
+                            </ul>
+                        </template>
+                    </RadioGroup>
+                </form.Field>
+
+                <!-- RadioGroup - binge drinking frequency - no. of times 6+ drinks are consumed on one occasion -->
+                <form.Field
+                    name="healthOverview.alcoholConsumption.bingeFrequency"
+                    v-slot="{ field }"
+                >
+                    <RadioGroup
+                        id="alcohol-consumption-binge-frequency-radio-group"
+                        prompt="How often do you have six or more drinks on one occasion?"
+                        :options="
+                            createRadioGroupOptions([
+                                'daily',
+                                '5-6 times per week',
+                                '3-4 times per week',
+                                '1-2 times per week',
+                                'never',
+                            ])
+                        "
+                        @change="(value) => field.handleChange(value)"
+                    />
+                </form.Field>
+            </template>
+
+            <Separator class="my-4" />
+
+            <!-- RadioGroup (binary) - Do you use recreational drugs? -->
+            <form.Field
+                name="healthOverview.usesRecreationalDrugs"
+                v-slot="{ field }"
+            >
+                <RadioGroup
+                    id="uses-recreational-drugs-radio-group"
+                    prompt="Do you use recreational drugs?"
+                    :options="binaryRadioGroup()"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
+                />
             </form.Field>
         </div>
     </div>
