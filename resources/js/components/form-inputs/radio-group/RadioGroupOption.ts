@@ -9,10 +9,10 @@ export default class RadioGroupOption {
     #label?: string;
     #value?: string;
 
-    public constructor(id: Lowercase<string>);
+    public constructor(id: string);
     public constructor(id: string, label: string, value: string);
     public constructor(id: string, label?: string, value?: string) {
-        this.#id = id;
+        this.#id = id.replaceAll(' ', '-');
 
         if (label && value) {
             this.#label = label;

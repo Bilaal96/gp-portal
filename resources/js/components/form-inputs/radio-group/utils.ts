@@ -10,7 +10,7 @@ export type RadioGroupOptionLiteral = {
     label: string;
     value: string;
 };
-type RadioGroupOptionInput = Lowercase<string> | RadioGroupOptionLiteral;
+type RadioGroupOptionInput = string | RadioGroupOptionLiteral;
 
 function toRadioGroupOption(input: RadioGroupOptionInput) {
     if (typeof input === 'string') {
