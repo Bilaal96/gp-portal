@@ -65,6 +65,9 @@ export interface FormTypes {
         };
         usesRecreationalDrugs: boolean | undefined;
     };
+    equalityAndAccessibility: {
+        ethnicity: string;
+    };
 }
 
 export type PatientRegistrationFormValues = typeof defaultValues;

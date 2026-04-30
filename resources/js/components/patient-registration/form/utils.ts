@@ -112,6 +112,9 @@ export const defaultValues = {
         usesRecreationalDrugs:
             undefined as FormTypes['healthOverview']['usesRecreationalDrugs'],
     },
+    equalityAndAccessibility: {
+        ethnicity: '',
+    },
 };
 
 // Form factory - required to extract type of useForm instance
