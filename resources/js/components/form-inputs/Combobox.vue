@@ -31,11 +31,11 @@ const props = defineProps<{
     prompt?: string; // shown in trigger
     placeholder?: string; // filter input placeholder
     emptyPrompt?: string; // shown when no filtered results
-    options: OptionsProp;
-    selectedOptions: string[];
     width?: string;
+    options: OptionsProp;
+    selected: string[] | string; // enables multiselect if array is provided
 }>();
-const emit = defineEmits(['update:selectedOptions']);
+const emit = defineEmits(['update:selected']);
 
 const open = ref(false);
 
@@ -90,21 +90,42 @@ function closeCommandList() {
 }
 
 function handleOptionSelect(option: LabelledOption) {
-    emit('update:selectedOptions', option.value);
-    closeCommandList();
+    emit('update:selected', option.value);
+
+    // Keep multiselect combobox open on selection
+    if (!Array.isArray(props.selected)) {
+        closeCommandList();
+    }
+}
+
+/**
+ * Determine if an option (in props.options) is selected
+ */
+function isSelected(optionValue: string): boolean {
+    if (Array.isArray(props.selected)) {
+        return props.selected.includes(optionValue);
+    }
+
+    return props.selected === optionValue;
+}
+
+function renderTriggerText() {
+    const defaultTriggerText = props.prompt ?? 'Select item...';
+    return Array.isArray(props.selected)
+        ? defaultTriggerText
+        : // selected is initially an empty string, provide fallback prompt
+          props.selected || defaultTriggerText;
 }
 
 const getCommandItemStyles = (optionValue: string) => {
     return cn(
         'hover:cursor-pointer hover:bg-primary/10 data-[highlighted]:bg-primary/20 data-[highlighted]:text-accent-foreground',
-        { 'bg-primary/40': props.selectedOptions.includes(optionValue) },
+        { 'bg-primary/40': isSelected(optionValue) },
     );
 };
 
 const showCheckIcon = (optionValue: string) => {
-    return props.selectedOptions.includes(optionValue)
-        ? 'opacity-100'
-        : 'opacity-0';
+    return isSelected(optionValue) ? 'opacity-100' : 'opacity-0';
 };
 </script>
 
@@ -125,7 +146,7 @@ const showCheckIcon = (optionValue: string) => {
                 "
             >
                 <span class="text-muted-foreground">
-                    {{ prompt ?? 'Select item...' }}
+                    {{ renderTriggerText() }}
                 </span>
                 <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>

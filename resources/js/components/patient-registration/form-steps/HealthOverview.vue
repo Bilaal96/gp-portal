@@ -9,8 +9,8 @@ import {
 import { ref, nextTick, useTemplateRef } from 'vue';
 import BadgeList from '@/components/BadgeList.vue';
 import {
+    Combobox,
     Input,
-    MultiSelectCombobox,
     RadioGroup,
     Textarea,
 } from '@/components/form-inputs';
@@ -46,7 +46,7 @@ import type { TanstackArrayField } from '@/types';
 
 const props = defineProps<FormStepProps>();
 
-// Conditionally renders longTermConditions MultiSelectCombobox field
+// Conditionally renders longTermConditions multiselect Combobox field
 const hasLongTermConditions = ref<boolean | undefined>(undefined);
 
 const majorIncidentDraft = useDraft(
@@ -240,20 +240,20 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
                 "
             />
 
-            <!-- MultiSelectCombobox - Specify long-term medical conditions -->
+            <!-- Multiselect Combobox - Specify long-term medical conditions -->
             <form.Field
                 v-if="hasLongTermConditions"
                 name="healthOverview.longTermConditions"
                 v-slot="{ field }"
             >
-                <MultiSelectCombobox
+                <Combobox
                     label="Please inform us of any long-term medical conditions that you have:"
                     prompt="Specify long-term medical conditions..."
                     empty-prompt="No matching conditions found."
                     placeholder="Search or specify"
                     :options="LONG_TERM_HEALTH_CONDITIONS"
-                    :selected-options="field.state.value"
-                    @update:selected-options="
+                    :selected="field.state.value"
+                    @update:selected="
                         (selectedValue) => {
                             const valueIndex =
                                 field.state.value.indexOf(selectedValue);
@@ -285,7 +285,7 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
                             <span>Add</span>
                         </Button>
                     </template>
-                </MultiSelectCombobox>
+                </Combobox>
 
                 <BadgeList :items="field.state.value" variant="outline">
                     <template #before="{ item }">
