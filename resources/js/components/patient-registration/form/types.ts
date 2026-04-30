@@ -67,6 +67,7 @@ export interface FormTypes {
     };
     equalityAndAccessibility: {
         ethnicity: string;
+        otherEthnicity: string;
     };
 }
 

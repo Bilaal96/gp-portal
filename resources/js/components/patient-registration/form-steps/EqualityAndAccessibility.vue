@@ -1,25 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
-import Input from '@/components/form-inputs/Input.vue';
+import { reactive, ref } from 'vue';
+import { Combobox, Input } from '@/components/form-inputs';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
 import type { FormStepProps } from '@/components/patient-registration/form-steps';
 
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Separator } from '@/components/ui/separator';
 import { useDebugForm } from '@/composables/useDebugForm';
 import { ONS_ETHNIC_GROUPS } from '@/lib/constants';
 
 const props = defineProps<FormStepProps>();
 
 const showOtherEthnicityInput = ref(false);
+const ethnicGroupsMap = reactive(ONS_ETHNIC_GROUPS);
 
 useDebugForm(props.form, {
     formStep: 'equalityAndAccessibility',
@@ -30,86 +21,93 @@ useDebugForm(props.form, {
     <div :id="props.id">
         <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
 
-        <!-- Ethnic Background
+        <div class="space-y-2">
+            <!-- Ethnic Background
         
-            Office for National Statistics (ONS) standard ethnic group categories 
-            - https://www.ethnicity-facts-figures.service.gov.uk/style-guide/ethnic-groups/ 
+                Office for National Statistics (ONS) standard ethnic group categories 
+                - https://www.ethnicity-facts-figures.service.gov.uk/style-guide/ethnic-groups/ 
+            -->
+            <div class="space-y-2">
+                <form.Field
+                    name="equalityAndAccessibility.ethnicity"
+                    v-slot="{ field }"
+                >
+                    <Combobox
+                        width="min-w-60"
+                        label="What is your ethnic background?"
+                        prompt="Specify ethnicity..."
+                        empty-prompt="No matching ethnicity found."
+                        placeholder="Search"
+                        :options="ethnicGroupsMap"
+                        :selected="field.state.value"
+                        @update:selected="
+                            (selectedValue) => {
+                                props.form.setFieldValue(
+                                    'equalityAndAccessibility.otherEthnicity',
+                                    '',
+                                );
+                                const selectedEthnicity =
+                                    selectedValue as string;
 
-            An Accordion whose AccordionItems each list a category of ethnic groups.
-            Expanding the category reveals a list of radio inputs 
-            - one for each ethnicity within the expanded category.
-        -->
-        <p class="mb-2 text-sm font-bold">
-            Please select the option that best describes your ethnicity:
-        </p>
-        <form.Field
-            name="equalityAndAccessibility.ethnicity"
-            v-slot="{ field }"
-        >
-            <Accordion type="single" collapsible class="w-full">
-                <RadioGroup
-                    class="gap-0"
-                    default-value=""
-                    @update:model-value="
-                        (value) => {
-                            const selectedEthnicity = value as string;
+                                const isOtherEthnicGroup =
+                                    selectedEthnicity.startsWith('Any other');
 
-                            const isOtherEthnicGroup =
-                                selectedEthnicity.startsWith('Any other');
+                                if (isOtherEthnicGroup) {
+                                    console.log(selectedEthnicity);
 
-                            if (isOtherEthnicGroup) {
-                                console.log(selectedEthnicity);
-
-                                field.handleChange('');
-                                showOtherEthnicityInput = true;
-                            } else {
-                                showOtherEthnicityInput = false;
+                                    // field.handleChange('');
+                                    showOtherEthnicityInput = true;
+                                } else {
+                                    showOtherEthnicityInput = false;
+                                }
                                 field.handleChange(selectedEthnicity);
                             }
-                        }
-                    "
-                >
-                    <template
-                        v-for="(
-                            ethnicGroupsList, ethnicGroupCategory
-                        ) in ONS_ETHNIC_GROUPS"
-                        :key="ethnicGroupCategory"
+                        "
                     >
-                        <AccordionItem :value="ethnicGroupCategory">
-                            <AccordionTrigger class="px-4">{{
-                                ethnicGroupCategory
-                            }}</AccordionTrigger>
-                            <AccordionContent class="space-y-2">
-                                <div
-                                    v-for="ethnicGroup in ethnicGroupsList"
-                                    class="ml-6 flex items-center gap-2"
-                                    :key="ethnicGroup"
-                                >
-                                    <RadioGroupItem
-                                        :id="ethnicGroup"
-                                        :value="ethnicGroup"
-                                    />
-                                    <Label :for="ethnicGroup">{{
-                                        ethnicGroup
-                                    }}</Label>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </template>
-                </RadioGroup>
-            </Accordion>
+                        <!-- Allows user to add unlisted ethnicity -->
+                        <!-- <template #action="{ input, closeCombobox }">
+                            <Button
+                                class="size-fit py-1"
+                                type="button"
+                                size="sm"
+                                @click.prevent.stop="
+                                    () => {
+                                        // Add other / unlisted ethnicity
+                                        const otherKey = 'Other ethnic group';
+                                        if (
+                                            !ethnicGroupsMap[otherKey].includes(input)
+                                        ) {
+                                            ethnicGroupsMap[otherKey].push(input);
+                                            field.handleChange(input);
+                                        }
+                                        closeCombobox();
+                                    }
+                                "
+                            >
+                                <PlusCircleIcon />
+                                <span>Other</span>
+                            </Button>
+                        </template> -->
+                    </Combobox>
+                </form.Field>
+            </div>
 
-            <!-- Specify unlisted ethnicity -->
-            <Separator v-if="showOtherEthnicityInput" class="mb-4" />
-            <Input
-                v-if="showOtherEthnicityInput"
-                class="max-w-sm"
-                id="unlisted-ethnicity"
-                label="Please specify your ethnicity if not explicitly listed above"
-                placeholder=""
-                v-bind="getTextFieldProps(field)"
-            />
-        </form.Field>
+            <form.Field
+                name="equalityAndAccessibility.otherEthnicity"
+                v-slot="{ field }"
+            >
+                <!-- <Separator v-if="showOtherEthnicityInput" class="mb-4" /> -->
+                <!-- Specify unlisted ethnicity -->
+                <Input
+                    v-if="showOtherEthnicityInput"
+                    class="max-w-sm"
+                    id="unlisted-ethnicity"
+                    label="Please specify your ethnicity if not explicitly listed above:"
+                    placeholder=""
+                    v-bind="getTextFieldProps(field)"
+                />
+            </form.Field>
+        </div>
 
         <!-- ! For reference only -->
         <!-- <div class="ml-2">
