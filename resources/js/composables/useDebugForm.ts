@@ -15,6 +15,10 @@ interface TanstackForm {
     1. leverage the `form.useStore` method to manually subscribe to changes in the Tanstack form state;
     2. watch its return value for changes;
     3. log the form, or form step (in a multi-step form).
+
+ * @param form - a tanstack form instance returned via `useForm` hook
+ * @param options.formStep - the name of a field passed to `useForm`'s `defaultValues` option
+ * @param options.label - identifies the log
  */
 export function useDebugForm(
     form: TanstackForm,
