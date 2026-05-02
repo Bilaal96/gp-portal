@@ -119,18 +119,29 @@ function renderTriggerText() {
 
 const getCommandItemStyles = (optionValue: string) => {
     return cn(
-        'hover:cursor-pointer hover:bg-primary/10 data-[highlighted]:bg-primary/20 data-[highlighted]:text-accent-foreground',
-        { 'bg-primary/40': isSelected(optionValue) },
+        // Global base (inc. hover styles)
+        'transition-all hover:cursor-pointer hover:bg-primary/10',
+
+        // Focused input / keyboard navigation
+        'data-[highlighted]:bg-primary/20 data-[highlighted]:font-semibold data-[highlighted]:text-black hover:data-[highlighted]:bg-primary/10',
+
+        // Selected item
+        isSelected(optionValue) ? 'bg-primary/40 text-accent-foreground' : '',
     );
 };
 
-const showCheckIcon = (optionValue: string) => {
-    return isSelected(optionValue) ? 'opacity-100' : 'opacity-0';
+const getCheckIconStyles = (optionValue: string) => {
+    return cn(
+        'mr-2 h-4 w-4 text-accent-foreground transition-all',
+
+        // show / hide check icon
+        isSelected(optionValue) ? 'opacity-100' : 'opacity-0',
+    );
 };
 </script>
 
 <template>
-    <p v-if="label" class="mb-2 ml-1 text-sm font-bold">{{ label }}</p>
+    <p v-if="label" class="font- mb-2 ml-1 text-sm font-bold">{{ label }}</p>
 
     <Popover v-model:open="open">
         <PopoverTrigger as-child>
@@ -145,7 +156,13 @@ const showCheckIcon = (optionValue: string) => {
                     )
                 "
             >
-                <span class="text-muted-foreground">
+                <span
+                    :class="
+                        cn('text-muted-foreground', {
+                            'text-accent-foreground': props.selected !== '',
+                        })
+                    "
+                >
                     {{ renderTriggerText() }}
                 </span>
                 <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -180,12 +197,7 @@ const showCheckIcon = (optionValue: string) => {
                                 :class="getCommandItemStyles(option.value)"
                             >
                                 <CheckIcon
-                                    :class="
-                                        cn(
-                                            'mr-2 h-4 w-4',
-                                            showCheckIcon(option.value),
-                                        )
-                                    "
+                                    :class="getCheckIconStyles(option.value)"
                                 />
                                 {{ option.label }}
                             </CommandItem>
@@ -211,10 +223,7 @@ const showCheckIcon = (optionValue: string) => {
                                 >
                                     <CheckIcon
                                         :class="
-                                            cn(
-                                                'mr-2 h-4 w-4',
-                                                showCheckIcon(option.value),
-                                            )
+                                            getCheckIconStyles(option.value)
                                         "
                                     />
                                     {{ option.label }}
