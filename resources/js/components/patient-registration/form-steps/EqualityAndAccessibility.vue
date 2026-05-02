@@ -10,8 +10,9 @@ import { ONS_ETHNIC_GROUPS, RELIGIOUS_BACKGROUNDS } from '@/lib/constants';
 
 const props = defineProps<FormStepProps>();
 
-const showOtherEthnicityInput = ref(false);
-const showOtherReligionInput = ref(false);
+// Track if an "other" option is selected
+const selectedOtherEthnicity = ref<string | null>(null);
+const selectedOtherReligion = ref(false);
 
 const ethnicGroupsMap = reactive(ONS_ETHNIC_GROUPS);
 
@@ -31,11 +32,11 @@ useDebugForm(props.form, {
                 Office for National Statistics (ONS) standard ethnic group categories 
                 - https://www.ethnicity-facts-figures.service.gov.uk/style-guide/ethnic-groups/ 
             -->
-            <div class="space-y-4">
-                <form.Field
-                    name="equalityAndAccessibility.ethnicity"
-                    v-slot="{ field }"
-                >
+            <form.Field
+                name="equalityAndAccessibility.ethnicity"
+                v-slot="{ field }"
+            >
+                <div class="space-y-4">
                     <Combobox
                         class="min-w-64"
                         label="What is your ethnic background?"
@@ -43,26 +44,16 @@ useDebugForm(props.form, {
                         empty-prompt="No matching ethnicity found."
                         placeholder="Search"
                         :options="ethnicGroupsMap"
-                        :selected="field.state.value"
+                        :selected="selectedOtherEthnicity ?? field.state.value"
                         @update:selected="
-                            (selectedValue) => {
-                                props.form.setFieldValue(
-                                    'equalityAndAccessibility.otherEthnicity',
-                                    '',
-                                );
-                                const selectedEthnicity =
-                                    selectedValue as string;
-
-                                const isOtherEthnicGroup =
-                                    selectedEthnicity.startsWith('Any other');
-
-                                if (isOtherEthnicGroup) {
-                                    showOtherEthnicityInput = true;
+                            (selectedEthnicity) => {
+                                if (selectedEthnicity.startsWith('Any other')) {
+                                    field.handleChange('');
+                                    selectedOtherEthnicity = selectedEthnicity;
                                 } else {
-                                    showOtherEthnicityInput = false;
+                                    selectedOtherEthnicity = null;
+                                    field.handleChange(selectedEthnicity);
                                 }
-
-                                field.handleChange(selectedEthnicity);
                             }
                         "
                     >
@@ -91,23 +82,17 @@ useDebugForm(props.form, {
                             </Button>
                         </template> -->
                     </Combobox>
-                </form.Field>
 
-                <!-- Specify unlisted ethnicity -->
-                <form.Field
-                    name="equalityAndAccessibility.otherEthnicity"
-                    v-slot="{ field }"
-                >
+                    <!-- Specify unlisted ethnicity -->
                     <Input
-                        v-if="showOtherEthnicityInput"
+                        v-if="selectedOtherEthnicity"
                         class="max-w-sm"
                         id="unlisted-ethnicity"
-                        label="Please specify your ethnicity if not explicitly listed above:"
-                        placeholder=""
+                        label="Please specify your ethnicity:"
                         v-bind="getTextFieldProps(field)"
                     />
-                </form.Field>
-            </div>
+                </div>
+            </form.Field>
 
             <Separator class="my-4" />
 
@@ -116,11 +101,11 @@ useDebugForm(props.form, {
                 Office for National Statistics (ONS) standard categories for religion 
                 - https://www.ons.gov.uk/census/census2021dictionary/variablesbytopic/ethnicgroupnationalidentitylanguageandreligionvariablescensus2021/religiondetailed
             -->
-            <div class="space-y-4">
-                <form.Field
-                    name="equalityAndAccessibility.religiousBackground"
-                    v-slot="{ field }"
-                >
+            <form.Field
+                name="equalityAndAccessibility.religiousBackground"
+                v-slot="{ field }"
+            >
+                <div class="space-y-4">
                     <Combobox
                         class="min-w-64"
                         label="What is your religion / spiritual background?"
@@ -128,41 +113,32 @@ useDebugForm(props.form, {
                         empty-prompt="No matching religion / spiritual background found."
                         placeholder="Search"
                         :options="RELIGIOUS_BACKGROUNDS"
-                        :selected="field.state.value"
+                        :selected="
+                            selectedOtherReligion ? 'Other' : field.state.value
+                        "
                         @update:selected="
                             (selectedValue) => {
-                                props.form.setFieldValue(
-                                    'equalityAndAccessibility.otherReligiousBackground',
-                                    '',
-                                );
-
                                 if (selectedValue === 'Other') {
-                                    showOtherReligionInput = true;
+                                    field.handleChange('');
+                                    selectedOtherReligion = true;
                                 } else {
-                                    showOtherReligionInput = false;
+                                    field.handleChange(selectedValue);
+                                    selectedOtherReligion = false;
                                 }
-
-                                field.handleChange(selectedValue);
                             }
                         "
                     />
-                </form.Field>
 
-                <!-- Specify unlisted ethnicity -->
-                <form.Field
-                    name="equalityAndAccessibility.otherReligiousBackground"
-                    v-slot="{ field }"
-                >
+                    <!-- Specify unlisted ethnicity -->
                     <Input
-                        v-if="showOtherReligionInput"
+                        v-if="selectedOtherReligion"
                         class="max-w-sm"
                         id="unlisted-religion"
-                        label="Please specify your religion / spiritual background if not explicitly listed above:"
-                        placeholder=""
+                        label="Please specify your religion / spiritual background:"
                         v-bind="getTextFieldProps(field)"
                     />
-                </form.Field>
-            </div>
+                </div>
+            </form.Field>
 
             <Separator class="mb-4" />
         </div>

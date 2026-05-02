@@ -45,7 +45,13 @@ function nextStep() {
             - Can pass additional props - they will merge 
             - Order matters - later props will override earlier ones with same name
         -->
-            <component :is="step.component" v-bind="step.props" :form="form" />
+            <keep-alive>
+                <component
+                    :is="step.component"
+                    v-bind="step.props"
+                    :form="form"
+                />
+            </keep-alive>
 
             <div class="mt-6 flex">
                 <Button
