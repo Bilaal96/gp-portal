@@ -161,7 +161,10 @@ const getCheckIconStyles = (optionValue: string) => {
                 <span
                     :class="
                         cn('text-muted-foreground', {
-                            'text-accent-foreground': props.selected !== '',
+                            // Single select Combobox only
+                            'text-accent-foreground':
+                                !Array.isArray(props.selected) &&
+                                props.selected !== '',
                         })
                     "
                 >
