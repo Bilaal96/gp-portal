@@ -115,6 +115,8 @@ export const defaultValues = {
     equalityAndAccessibility: {
         ethnicity: '',
         otherEthnicity: '',
+        religiousBackground: '',
+        otherReligiousBackground: '',
     },
 };
 
