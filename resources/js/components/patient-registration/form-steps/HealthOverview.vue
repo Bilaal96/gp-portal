@@ -241,69 +241,75 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
             />
 
             <!-- Multiselect Combobox - Specify long-term medical conditions -->
-            <form.Field
-                v-if="hasLongTermConditions"
-                name="healthOverview.longTermConditions"
-                v-slot="{ field }"
-            >
-                <Combobox
-                    label="Please inform us of any long-term medical conditions that you have:"
-                    prompt="Specify long-term medical conditions..."
-                    empty-prompt="No matching conditions found."
-                    placeholder="Search or specify"
-                    :options="LONG_TERM_HEALTH_CONDITIONS"
-                    :selected="field.state.value"
-                    @update:selected="
-                        (selectedValue) => {
-                            const valueIndex =
-                                field.state.value.indexOf(selectedValue);
-
-                            if (valueIndex === -1) {
-                                field.pushValue(selectedValue);
-                            } else {
-                                field.removeValue(valueIndex);
-                            }
-                        }
-                    "
+            <div class="space-y-2">
+                <form.Field
+                    v-if="hasLongTermConditions"
+                    name="healthOverview.longTermConditions"
+                    v-slot="{ field }"
                 >
-                    <!-- Allows user to add unlisted conditions -->
-                    <template #action="{ input, closeCombobox }">
-                        <Button
-                            class="size-fit py-1"
-                            type="button"
-                            size="sm"
-                            @click.prevent.stop="
-                                () => {
-                                    if (!field.state.value.includes(input)) {
-                                        field.pushValue(input);
-                                    }
-                                    closeCombobox();
-                                }
-                            "
-                        >
-                            <PlusCircleIcon />
-                            <span>Add</span>
-                        </Button>
-                    </template>
-                </Combobox>
+                    <Combobox
+                        label="Please inform us of any long-term medical conditions that you have:"
+                        prompt="Specify long-term medical conditions..."
+                        empty-prompt="No matching conditions found."
+                        placeholder="Search or specify"
+                        :options="LONG_TERM_HEALTH_CONDITIONS"
+                        :selected="field.state.value"
+                        @update:selected="
+                            (selectedValue) => {
+                                const valueIndex =
+                                    field.state.value.indexOf(selectedValue);
 
-                <BadgeList :items="field.state.value" variant="outline">
-                    <template #before="{ item }">
-                        <MinusCircleIcon
-                            role="button"
-                            :size="16"
-                            class="text-red-700 transition-all hover:scale-110 hover:cursor-pointer"
-                            @click.prevent.stop="
-                                () => {
-                                    const valueIndex =
-                                        field.state.value.indexOf(item);
+                                if (valueIndex === -1) {
+                                    field.pushValue(selectedValue);
+                                } else {
                                     field.removeValue(valueIndex);
                                 }
-                            "
-                        />
+                            }
+                        "
+                    >
+                        <!-- Allows user to add unlisted conditions -->
+                        <template #action="{ input, closeCombobox }">
+                            <Button
+                                class="size-fit py-1"
+                                type="button"
+                                size="sm"
+                                @click.prevent.stop="
+                                    () => {
+                                        if (
+                                            !field.state.value.includes(input)
+                                        ) {
+                                            field.pushValue(input);
+                                        }
+                                        closeCombobox();
+                                    }
+                                "
+                            >
+                                <PlusCircleIcon />
+                                <span>Add</span>
+                            </Button>
+                        </template>
+                    </Combobox>
+
+                    <template v-if="field.state.value.length">
+                        <BadgeList :items="field.state.value" variant="outline">
+                            <template #before="{ item }">
+                                <MinusCircleIcon
+                                    role="button"
+                                    :size="16"
+                                    class="text-red-700 transition-all hover:scale-110 hover:cursor-pointer"
+                                    @click.prevent.stop="
+                                        () => {
+                                            const valueIndex =
+                                                field.state.value.indexOf(item);
+                                            field.removeValue(valueIndex);
+                                        }
+                                    "
+                                />
+                            </template>
+                        </BadgeList>
                     </template>
-                </BadgeList>
-            </form.Field>
+                </form.Field>
+            </div>
 
             <Separator class="my-4" />
 

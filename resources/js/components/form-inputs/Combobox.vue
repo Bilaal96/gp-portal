@@ -26,12 +26,14 @@ type Option = string | LabelledOption;
 type GroupedOptions = Record<string, Option[]>;
 type OptionsProp = Option[] | GroupedOptions;
 
+defineOptions({ inheritAttrs: false });
+
 const props = defineProps<{
     label?: string; // user instruction
     prompt?: string; // shown in trigger
     placeholder?: string; // filter input placeholder
     emptyPrompt?: string; // shown when no filtered results
-    width?: string;
+    popoverContentStyles?: string;
     options: OptionsProp;
     selected: string[] | string; // enables multiselect if array is provided
 }>();
@@ -151,10 +153,10 @@ const getCheckIconStyles = (optionValue: string) => {
                 :aria-expanded="open"
                 :class="
                     cn(
-                        'mb-2 justify-between hover:cursor-pointer hover:bg-primary/40',
-                        width,
+                        'justify-between hover:cursor-pointer hover:bg-primary/40',
                     )
                 "
+                v-bind="$attrs"
             >
                 <span
                     :class="
@@ -168,7 +170,7 @@ const getCheckIconStyles = (optionValue: string) => {
                 <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
         </PopoverTrigger>
-        <PopoverContent :class="cn('p-0', width)" align="start">
+        <PopoverContent :class="cn('p-0', popoverContentStyles)" align="start">
             <Command>
                 <CommandInput :placeholder="placeholder ?? 'Search'">
                     <!-- Slot reserved for action button -->
