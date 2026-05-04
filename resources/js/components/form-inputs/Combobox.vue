@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, useSlots } from 'vue';
 import { Button } from '@/components/ui/button';
 import {
     Command,
@@ -38,6 +38,8 @@ const props = defineProps<{
     selected: string[] | string; // enables multiselect if array is provided
 }>();
 const emit = defineEmits(['update:selected']);
+
+const slots = useSlots();
 
 const open = ref(false);
 
@@ -143,84 +145,74 @@ const getCheckIconStyles = (optionValue: string) => {
 </script>
 
 <template>
-    <p v-if="label" class="font- mb-2 ml-1 text-sm font-bold">{{ label }}</p>
+    <div>
+        <!-- Label -->
+        <p v-if="label" class="mb-2 ml-1 text-sm font-bold">
+            {{ label }}
+        </p>
 
-    <Popover v-model:open="open">
-        <PopoverTrigger as-child>
-            <Button
-                variant="outline"
-                role="combobox"
-                :aria-expanded="open"
-                :class="
-                    cn(
-                        'justify-between hover:cursor-pointer hover:bg-primary/40',
-                    )
-                "
-                v-bind="$attrs"
-            >
-                <span
+        <!-- Subtext -->
+        <div v-if="slots.subtext" class="mb-3 ml-1 text-xs">
+            <slot name="subtext" />
+        </div>
+
+        <!-- Combobox -->
+        <Popover v-model:open="open">
+            <PopoverTrigger as-child>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    :aria-expanded="open"
                     :class="
-                        cn('text-muted-foreground', {
-                            // Single select Combobox only
-                            'text-accent-foreground':
-                                !Array.isArray(props.selected) &&
-                                props.selected !== '',
-                        })
+                        cn(
+                            'justify-between hover:cursor-pointer hover:bg-primary/40',
+                        )
                     "
+                    v-bind="$attrs"
                 >
-                    {{ renderTriggerText() }}
-                </span>
-                <ChevronsUpDownIcon class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-        </PopoverTrigger>
-        <PopoverContent :class="cn('p-0', popoverContentStyles)" align="start">
-            <Command>
-                <CommandInput :placeholder="placeholder ?? 'Search'">
-                    <!-- Slot reserved for action button -->
-                    <template #action="slotProps">
-                        <slot
-                            name="action"
-                            v-bind="slotProps"
-                            :close-combobox="closeCommandList"
-                        />
-                    </template>
-                </CommandInput>
+                    <span
+                        :class="
+                            cn('text-muted-foreground', {
+                                // Single select Combobox only
+                                'text-accent-foreground':
+                                    !Array.isArray(props.selected) &&
+                                    props.selected !== '',
+                            })
+                        "
+                    >
+                        {{ renderTriggerText() }}
+                    </span>
+                    <ChevronsUpDownIcon
+                        class="ml-2 h-4 w-4 shrink-0 opacity-50"
+                    />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent
+                :class="cn('p-0', popoverContentStyles)"
+                align="start"
+            >
+                <Command>
+                    <CommandInput :placeholder="placeholder ?? 'Search'">
+                        <!-- Slot reserved for action button -->
+                        <template #action="slotProps">
+                            <slot
+                                name="action"
+                                v-bind="slotProps"
+                                :close-combobox="closeCommandList"
+                            />
+                        </template>
+                    </CommandInput>
 
-                <CommandList>
-                    <CommandEmpty>{{
-                        emptyPrompt ?? 'No matches found.'
-                    }}</CommandEmpty>
+                    <CommandList>
+                        <CommandEmpty>{{
+                            emptyPrompt ?? 'No matches found.'
+                        }}</CommandEmpty>
 
-                    <!-- Render simple `LabelledOptions[]` -->
-                    <template v-if="ungroupedOptions">
-                        <CommandGroup class="space-y-0.5">
-                            <CommandItem
-                                v-for="option in ungroupedOptions"
-                                :key="option.value"
-                                :value="option.value"
-                                @select="handleOptionSelect(option)"
-                                :class="getCommandItemStyles(option.value)"
-                            >
-                                <CheckIcon
-                                    :class="getCheckIconStyles(option.value)"
-                                />
-                                {{ option.label }}
-                            </CommandItem>
-                        </CommandGroup>
-                    </template>
-
-                    <!-- Render grouped `LabelledOptions[]` -->
-                    <template v-if="groupedOptions">
-                        <template
-                            v-for="(options, groupName) in groupedOptions"
-                            :key="groupName"
-                        >
-                            <CommandGroup
-                                class="space-y-0.5"
-                                :heading="groupName"
-                            >
+                        <!-- Render simple `LabelledOptions[]` -->
+                        <template v-if="ungroupedOptions">
+                            <CommandGroup class="space-y-0.5">
                                 <CommandItem
-                                    v-for="option in options"
+                                    v-for="option in ungroupedOptions"
                                     :key="option.value"
                                     :value="option.value"
                                     @select="handleOptionSelect(option)"
@@ -235,9 +227,39 @@ const getCheckIconStyles = (optionValue: string) => {
                                 </CommandItem>
                             </CommandGroup>
                         </template>
-                    </template>
-                </CommandList>
-            </Command>
-        </PopoverContent>
-    </Popover>
+
+                        <!-- Render grouped `LabelledOptions[]` -->
+                        <template v-if="groupedOptions">
+                            <template
+                                v-for="(options, groupName) in groupedOptions"
+                                :key="groupName"
+                            >
+                                <CommandGroup
+                                    class="space-y-0.5"
+                                    :heading="groupName"
+                                >
+                                    <CommandItem
+                                        v-for="option in options"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        @select="handleOptionSelect(option)"
+                                        :class="
+                                            getCommandItemStyles(option.value)
+                                        "
+                                    >
+                                        <CheckIcon
+                                            :class="
+                                                getCheckIconStyles(option.value)
+                                            "
+                                        />
+                                        {{ option.label }}
+                                    </CommandItem>
+                                </CommandGroup>
+                            </template>
+                        </template>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    </div>
 </template>
