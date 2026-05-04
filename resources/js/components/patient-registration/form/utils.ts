@@ -119,6 +119,9 @@ export const defaultValues = {
             undefined as FormTypes['equalityAndAccessibility']['requiresAidAndSupport'],
         requiredAidAndSupport:
             [] as FormTypes['equalityAndAccessibility']['requiredAidAndSupport'],
+        preferredLanguage: '',
+        requiresInterpreter:
+            undefined as FormTypes['equalityAndAccessibility']['requiresInterpreter'],
     },
 };
 

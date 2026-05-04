@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { useDebugForm } from '@/composables/useDebugForm';
 import {
     ACCESSIBILITY_AIDS_AND_SUPPORT,
+    LANGUAGES,
     ONS_ETHNIC_GROUPS,
     RELIGIOUS_BACKGROUNDS,
 } from '@/lib/constants';
@@ -24,6 +25,7 @@ const props = defineProps<FormStepProps>();
 // Track if an "other" option is selected
 const selectedOtherEthnicity = ref<string | null>(null);
 const selectedOtherReligion = ref(false);
+const selectedOtherLanguage = ref<string | null>(null);
 
 const ethnicGroupsMap = reactive(ONS_ETHNIC_GROUPS);
 
@@ -61,7 +63,7 @@ useDebugForm(props.form, {
                         :options="ethnicGroupsMap"
                         :selected="selectedOtherEthnicity ?? field.state.value"
                         @update:selected="
-                            (selectedEthnicity) => {
+                            (selectedEthnicity: string) => {
                                 if (selectedEthnicity.startsWith('Any other')) {
                                     field.handleChange('');
                                     selectedOtherEthnicity = selectedEthnicity;
@@ -132,12 +134,12 @@ useDebugForm(props.form, {
                             selectedOtherReligion ? 'Other' : field.state.value
                         "
                         @update:selected="
-                            (selectedValue) => {
-                                if (selectedValue === 'Other') {
+                            (selectedReligion: string) => {
+                                if (selectedReligion === 'Other') {
                                     field.handleChange('');
                                     selectedOtherReligion = true;
                                 } else {
-                                    field.handleChange(selectedValue);
+                                    field.handleChange(selectedReligion);
                                     selectedOtherReligion = false;
                                 }
                             }
@@ -203,12 +205,13 @@ useDebugForm(props.form, {
                         :options="ACCESSIBILITY_AIDS_AND_SUPPORT"
                         :selected="field.state.value"
                         @update:selected="
-                            (selectedValue) => {
-                                const valueIndex =
-                                    field.state.value.indexOf(selectedValue);
+                            (selectedSupportRequirement) => {
+                                const valueIndex = field.state.value.indexOf(
+                                    selectedSupportRequirement,
+                                );
 
                                 if (valueIndex === -1) {
-                                    field.pushValue(selectedValue);
+                                    field.pushValue(selectedSupportRequirement);
                                 } else {
                                     field.removeValue(valueIndex);
                                 }
@@ -270,28 +273,61 @@ useDebugForm(props.form, {
 
             <Separator class="mb-4" />
 
-            <!-- Combobox (single select) -  Preferred language for healthcare
-                + other field for unlisted languages
-            -->
+            <!-- Combobox (single select) -  Preferred language for healthcare -->
+            <form.Field
+                name="equalityAndAccessibility.preferredLanguage"
+                v-slot="{ field }"
+            >
+                <div class="space-y-4">
+                    <Combobox
+                        class="min-w-64"
+                        label="What is your preferred language for communication during healthcare?"
+                        prompt="Specify language..."
+                        empty-prompt="No matching language found."
+                        placeholder="Search"
+                        :options="LANGUAGES"
+                        :selected="selectedOtherLanguage ?? field.state.value"
+                        @update:selected="
+                            (selectedLanguage: string) => {
+                                if (selectedLanguage.startsWith('Other')) {
+                                    field.handleChange('');
+                                    selectedOtherLanguage = selectedLanguage;
+                                } else {
+                                    selectedOtherLanguage = null;
+                                    field.handleChange(selectedLanguage);
+                                }
+                            }
+                        "
+                    />
+
+                    <!-- Specify unlisted language -->
+                    <Input
+                        v-if="selectedOtherLanguage"
+                        class="max-w-sm"
+                        id="unlisted-language"
+                        label="Please specify your preferred language manually:"
+                        v-bind="getTextFieldProps(field)"
+                    />
+                </div>
+            </form.Field>
+
             <!-- RadioGroup (binary) - Do you need an interpreter? -->
+            <form.Field
+                name="equalityAndAccessibility.requiresInterpreter"
+                v-slot="{ field }"
+            >
+                <RadioGroup
+                    id="required-aid-and-support"
+                    prompt="Do you need a language interpreter?"
+                    :options="binaryRadioGroup()"
+                    :default-value="getBinaryRadioGroupDefaultValue(field)"
+                    @change="
+                        (value) =>
+                            field.handleChange(value === 'yes' ? true : false)
+                    "
+                />
+            </form.Field>
         </div>
         <!-- End of wrapper around all inputs -->
-
-        <!-- ! For reference only -->
-        <!-- <div class="ml-2">
-            <RadioGroup
-                :default-value
-                @update:model-value="(value) => $emit('change', value)"
-            >
-                <div
-                    v-for="{ id, label, value } in props.options"
-                    class="flex items-center gap-2"
-                    :key="id"
-                >
-                    <RadioGroupItem :id :value />
-                    <Label :for="id">{{ label }}</Label>
-                </div>
-            </RadioGroup>
-        </div> -->
     </div>
 </template>

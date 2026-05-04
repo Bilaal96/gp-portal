@@ -70,6 +70,8 @@ export interface FormTypes {
         religiousBackground: string;
         requiresAidAndSupport: boolean | undefined;
         requiredAidAndSupport: string[];
+        preferredLanguage: string;
+        requiresInterpreter: boolean | undefined;
     };
 }
 
