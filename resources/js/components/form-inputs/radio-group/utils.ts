@@ -1,4 +1,5 @@
 import RadioGroupOption from '@/components/form-inputs/radio-group/RadioGroupOption';
+import type { TanstackField } from '@/types';
 
 /**
  * Convenience helper used to generate values for `options` prop of `/js/components/form-inputs/RadioGroup.vue`.
@@ -40,4 +41,19 @@ export function binaryRadioGroup(
     }
 
     return createRadioGroupOptions(options) as BinaryRadioGroupOptions;
+}
+
+/**
+ * Determine default value for basic binary (yes/no) RadioGroup form input & preserve default value on navigation.
+ * This is particularly important for RadioGroup values that are used to show/hide conditional fields, as it ensures that they're correctly shown/hidden.
+ */
+export function getBinaryRadioGroupDefaultValue(
+    field: TanstackField<boolean | undefined>,
+) {
+    // An option has not been selected
+    if (field.state.value === undefined) return '';
+    // 'Yes' option has been selected
+    if (field.state.value) return 'yes';
+    // 'No' option has been selected
+    return 'no';
 }
