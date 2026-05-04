@@ -115,6 +115,10 @@ export const defaultValues = {
     equalityAndAccessibility: {
         ethnicity: '',
         religiousBackground: '',
+        requiresAidAndSupport:
+            undefined as FormTypes['equalityAndAccessibility']['requiresAidAndSupport'],
+        requiredAidAndSupport:
+            [] as FormTypes['equalityAndAccessibility']['requiredAidAndSupport'],
     },
 };
 

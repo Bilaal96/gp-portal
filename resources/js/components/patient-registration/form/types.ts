@@ -68,6 +68,8 @@ export interface FormTypes {
     equalityAndAccessibility: {
         ethnicity: string;
         religiousBackground: string;
+        requiresAidAndSupport: boolean | undefined;
+        requiredAidAndSupport: string[];
     };
 }
 

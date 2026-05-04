@@ -1,12 +1,23 @@
 <script setup lang="ts">
+import { MinusCircleIcon, PlusCircleIcon } from 'lucide-vue-next';
 import { reactive, ref } from 'vue';
-import { Combobox, Input } from '@/components/form-inputs';
+import BadgeList from '@/components/BadgeList.vue';
+import { Combobox, Input, RadioGroup } from '@/components/form-inputs';
+import {
+    binaryRadioGroup,
+    getBinaryRadioGroupDefaultValue,
+} from '@/components/form-inputs/radio-group/utils';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
 import type { FormStepProps } from '@/components/patient-registration/form-steps';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 import { useDebugForm } from '@/composables/useDebugForm';
-import { ONS_ETHNIC_GROUPS, RELIGIOUS_BACKGROUNDS } from '@/lib/constants';
+import {
+    ACCESSIBILITY_AIDS_AND_SUPPORT,
+    ONS_ETHNIC_GROUPS,
+    RELIGIOUS_BACKGROUNDS,
+} from '@/lib/constants';
 
 const props = defineProps<FormStepProps>();
 
@@ -15,6 +26,10 @@ const selectedOtherEthnicity = ref<string | null>(null);
 const selectedOtherReligion = ref(false);
 
 const ethnicGroupsMap = reactive(ONS_ETHNIC_GROUPS);
+
+const requiresAidAndSupport = props.form.useStore(
+    (state) => state.values.equalityAndAccessibility.requiresAidAndSupport,
+);
 
 useDebugForm(props.form, {
     formStep: 'equalityAndAccessibility',
@@ -141,6 +156,124 @@ useDebugForm(props.form, {
             </form.Field>
 
             <Separator class="mb-4" />
+
+            <!-- RadioGroup (binary) - Do you need any accessibility support for your appointments? -->
+            <form.Field
+                name="equalityAndAccessibility.requiresAidAndSupport"
+                v-slot="{ field }"
+            >
+                <RadioGroup
+                    id="required-aid-and-support"
+                    prompt="Do you need any accessibility support for your appointments?"
+                    :options="binaryRadioGroup()"
+                    :default-value="getBinaryRadioGroupDefaultValue(field)"
+                    @change="
+                        (value) => {
+                            // Clear previously specified required support
+                            if (value === 'no')
+                                props.form.setFieldValue(
+                                    'equalityAndAccessibility.requiredAidAndSupport',
+                                    [],
+                                );
+
+                            field.handleChange(value === 'yes' ? true : false);
+                        }
+                    "
+                >
+                    <template #subtext>
+                        <p>
+                            This helps us make any adjustments you may need when
+                            visiting the practice.
+                        </p>
+                    </template>
+                </RadioGroup>
+            </form.Field>
+
+            <!-- Combobox (multi-select) - What accessibility support or adjustments do you need? -->
+            <div v-if="requiresAidAndSupport" class="space-y-2">
+                <form.Field
+                    name="equalityAndAccessibility.requiredAidAndSupport"
+                    v-slot="{ field }"
+                >
+                    <Combobox
+                        class="min-w-64"
+                        label="What accessibility support or adjustments do you need?"
+                        prompt="Specify required support..."
+                        placeholder="Search or specify"
+                        :options="ACCESSIBILITY_AIDS_AND_SUPPORT"
+                        :selected="field.state.value"
+                        @update:selected="
+                            (selectedValue) => {
+                                const valueIndex =
+                                    field.state.value.indexOf(selectedValue);
+
+                                if (valueIndex === -1) {
+                                    field.pushValue(selectedValue);
+                                } else {
+                                    field.removeValue(valueIndex);
+                                }
+                            }
+                        "
+                    >
+                        <!-- Subtext -->
+                        <template #subtext>
+                            <p>
+                                Select all that apply. You can also tell us in
+                                your own words.
+                            </p>
+                        </template>
+
+                        <!-- Allows user to add unlisted conditions -->
+                        <template #action="{ input, closeCombobox }">
+                            <Button
+                                class="size-fit py-1"
+                                type="button"
+                                size="sm"
+                                @click.prevent.stop="
+                                    () => {
+                                        if (
+                                            !field.state.value.includes(input)
+                                        ) {
+                                            field.pushValue(input);
+                                        }
+                                        closeCombobox();
+                                    }
+                                "
+                            >
+                                <PlusCircleIcon />
+                                <span>Add</span>
+                            </Button>
+                        </template>
+                    </Combobox>
+
+                    <!-- List of selected values -->
+                    <template v-if="field.state.value.length">
+                        <BadgeList :items="field.state.value" variant="outline">
+                            <template #before="{ item }">
+                                <MinusCircleIcon
+                                    role="button"
+                                    :size="16"
+                                    class="text-red-700 transition-all hover:scale-110 hover:cursor-pointer"
+                                    @click.prevent.stop="
+                                        () => {
+                                            const valueIndex =
+                                                field.state.value.indexOf(item);
+                                            field.removeValue(valueIndex);
+                                        }
+                                    "
+                                />
+                            </template>
+                        </BadgeList>
+                    </template>
+                </form.Field>
+            </div>
+
+            <Separator class="mb-4" />
+
+            <!-- Combobox (single select) -  Preferred language for healthcare
+                + other field for unlisted languages
+            -->
+            <!-- RadioGroup (binary) - Do you need an interpreter? -->
         </div>
         <!-- End of wrapper around all inputs -->
 
