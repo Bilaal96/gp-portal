@@ -26,7 +26,12 @@
     - must manually parse string value to int & handle NaN results
  */
 
-import { computed, useTemplateRef, type InputHTMLAttributes } from 'vue';
+import {
+    computed,
+    useSlots,
+    useTemplateRef,
+    type InputHTMLAttributes,
+} from 'vue';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
@@ -41,6 +46,8 @@ defineEmits(['input']);
 
 const inputRef = useTemplateRef('input');
 defineExpose({ input: inputRef });
+
+const slots = useSlots();
 
 // Required to get around known TS error caused when destructuring from large types such as InputHTMLAttributes
 const inputProps = computed<InputHTMLAttributes>(() => {
@@ -70,6 +77,10 @@ const inputProps = computed<InputHTMLAttributes>(() => {
             class="ml-1 font-bold"
             >{{ props.label }}</Label
         >
+
+        <div v-if="slots.subtext">
+            <slot name="subtext" />
+        </div>
 
         <input
             ref="input"
