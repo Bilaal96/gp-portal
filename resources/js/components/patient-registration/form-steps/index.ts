@@ -21,6 +21,7 @@ import Contact from '@/components/patient-registration/form-steps/Contact.vue';
 import EqualityAndAccessibility from '@/components/patient-registration/form-steps/EqualityAndAccessibility.vue';
 import HealthOverview from '@/components/patient-registration/form-steps/HealthOverview.vue';
 import Identity from '@/components/patient-registration/form-steps/Identity.vue';
+import LegalConsent from '@/components/patient-registration/form-steps/LegalConsent.vue';
 import PersonalDetails from '@/components/patient-registration/form-steps/PersonalDetails.vue';
 import PreviousMedicalRecords from '@/components/patient-registration/form-steps/PreviousMedicalRecords.vue';
 
@@ -85,6 +86,13 @@ const formSteps: FormStepConfig[] = [
         props: {
             id: 'equality-and-accessibility',
             title: 'Equality, Accessibility & Communication Needs',
+        },
+    },
+    {
+        component: LegalConsent,
+        props: {
+            id: 'legal-consent',
+            title: 'Declaration of Legal Consent',
         },
     },
 ];

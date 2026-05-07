@@ -123,6 +123,12 @@ export const defaultValues = {
         requiresInterpreter:
             undefined as FormTypes['equalityAndAccessibility']['requiresInterpreter'],
     },
+    legalConsent: {
+        canContactViaSmsOrEmail:
+            undefined as FormTypes['legalConsent']['canContactViaSmsOrEmail'],
+        dataSharing: [] as FormTypes['legalConsent']['dataSharing'],
+        digitalSignature: '' as FormTypes['legalConsent']['digitalSignature'],
+    },
 };
 
 // Form factory - required to extract type of useForm instance

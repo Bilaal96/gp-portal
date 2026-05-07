@@ -73,6 +73,11 @@ export interface FormTypes {
         preferredLanguage: string;
         requiresInterpreter: boolean | undefined;
     };
+    legalConsent: {
+        canContactViaSmsOrEmail: boolean | undefined;
+        dataSharing: string[];
+        digitalSignature: string;
+    };
 }
 
 export type PatientRegistrationFormValues = typeof defaultValues;
