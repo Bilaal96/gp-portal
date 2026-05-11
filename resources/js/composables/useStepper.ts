@@ -8,7 +8,14 @@ type StepperContext = {
     prev: () => void;
 };
 
-const stepperInjectionKey = Symbol('stepper') as InjectionKey<StepperContext>;
+/**
+ * Symbol.for() uses key (if exists) from Global Symbol Registry (GSR), otherwise creates it.
+ * This prevents browser errors after HMR caused by stale Symbol (from previous render).
+ * GSR is shared across entire JS runtime - use a distinct/namespaced key to prevent potential key conflicts.
+ */
+const stepperInjectionKey = Symbol.for(
+    'gp-portal:stepper',
+) as InjectionKey<StepperContext>;
 
 // Provider
 export function provideStepper(localStorageKey: string) {
