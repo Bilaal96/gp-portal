@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
-import { Home } from 'lucide-vue-next';
-import type { Component } from 'vue';
+import formSteps from '@/components/patient-registration/form-steps';
 
 import { Separator } from '@/components/ui/separator';
 import {
@@ -11,37 +10,13 @@ import {
     SidebarGroupLabel,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from '@/components/ui/sidebar';
+import { useStepper } from '@/composables/useStepper';
+import { cn } from '@/lib/utils';
 
-interface Item {
-    title: string;
-    url: string;
-    icon?: Component;
-}
-
-const items: Item[] = [
-    {
-        title: 'Step 1',
-        url: '#',
-        icon: Home,
-    },
-    {
-        title: 'Step 2',
-        url: '#',
-    },
-    {
-        title: 'Step 3',
-        url: '#',
-    },
-    {
-        title: 'Step 4',
-        url: '#',
-    },
-    {
-        title: 'Step 5',
-        url: '#',
-    },
-];
+const stepper = useStepper();
+const sidebar = useSidebar();
 
 // Used to toggle Sidebar's collapsible prop
 const breakpoints = useBreakpoints(breakpointsTailwind);
@@ -56,28 +31,37 @@ const breakpoints = useBreakpoints(breakpointsTailwind);
     >
         <!-- Equivalent to: <SidebarContent /> -->
         <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
+            <SidebarGroupLabel>Patient Registration Steps</SidebarGroupLabel>
             <SidebarGroupContent>
-                <!-- TODO: separate each menu item with Separator component -->
                 <SidebarMenuItem
                     class="list-none"
-                    v-for="(item, index) in items"
-                    :key="item.title"
+                    v-for="(stepComponent, index) in formSteps"
+                    :key="stepComponent.props.title"
                 >
                     <SidebarMenuButton
-                        as-child
-                        class="rounded px-2 py-1 hover:bg-emerald-200"
+                        :class="
+                            cn(
+                                'h-max cursor-pointer rounded px-2 py-2 transition-all',
+                                // hover state
+                                'hover:border-l-4 hover:border-primary/40 hover:bg-primary/20',
+                                {
+                                    // current step
+                                    'border-l-4 border-primary bg-primary/50':
+                                        index === stepper.stepIndex.value,
+                                },
+                            )
+                        "
+                        @click="
+                            () => {
+                                stepper.setStepIndex(index);
+                                sidebar.setOpenMobile(false);
+                            }
+                        "
                     >
-                        <a :href="item.url">
-                            <component
-                                v-if="item.icon !== undefined"
-                                :is="item.icon"
-                            />
-                            <span>{{ item.title }}</span>
-                        </a>
+                        {{ index + 1 + '. ' + stepComponent.props.title }}
                     </SidebarMenuButton>
                     <Separator
-                        v-if="index + 1 !== items.length"
+                        v-if="index + 1 !== formSteps.length"
                         class="my-1 bg-muted-foreground"
                     />
                 </SidebarMenuItem>
