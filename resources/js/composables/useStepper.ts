@@ -1,8 +1,16 @@
 import { useLocalStorage } from '@vueuse/core';
-import { inject, type InjectionKey, provide, readonly, type Ref } from 'vue';
+import {
+    computed,
+    inject,
+    type InjectionKey,
+    provide,
+    readonly,
+    type Ref,
+} from 'vue';
 
 type StepperContext = {
     stepIndex: Ref<number>;
+    stepNumber: Ref<number>;
     setStepIndex: (value: number) => void;
     next: () => void;
     prev: () => void;
@@ -21,6 +29,7 @@ const stepperInjectionKey = Symbol.for(
 export function provideStepper(localStorageKey: string) {
     // REVIEW: [DEV] local storage used so I don't have to keep navigating form steps
     const stepIndex = useLocalStorage(localStorageKey, 0);
+    const stepNumber = computed(() => stepIndex.value + 1);
 
     function setStepIndex(value: number) {
         stepIndex.value = value;
@@ -35,7 +44,8 @@ export function provideStepper(localStorageKey: string) {
     }
 
     const stepper = {
-        stepIndex: readonly(stepIndex),
+        stepIndex: readonly(stepIndex), // zero-based index
+        stepNumber,
         setStepIndex,
         next,
         prev,

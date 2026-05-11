@@ -31,7 +31,7 @@ watchEffect(() => {
 <template>
     <div class="patient-registration">
         <p class="lg:text-red-600">
-            Step: {{ stepper.stepIndex.value + 1 }} / {{ formSteps.length }}
+            Step: {{ stepper.stepNumber.value }} / {{ formSteps.length }}
         </p>
 
         <form @submit="form.handleSubmit()">
