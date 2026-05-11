@@ -39,8 +39,6 @@ useDebugForm(props.form, { formStep: 'identity', label: props.title });
 
 <template>
     <div :id="props.id">
-        <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
-
         <p class="mb-4">
             Before we begin, we must confirm if you are applying for yourself or
             on behalf of someone else. Please answer the following questions to

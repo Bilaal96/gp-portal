@@ -28,8 +28,6 @@ useDebugForm(props.form, { formStep: 'legalConsent', label: props.title });
 </script>
 <template>
     <div :class="props.id">
-        <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
-
         <div class="space-y-4">
             <!-- RadioGroup (binary) - Do you consent to us contacting you by SMS/email? -->
             <form.Field

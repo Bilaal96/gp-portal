@@ -35,8 +35,6 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
 
 <template>
     <div :id="props.id">
-        <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
-
         <p class="mb-4">
             Please provide your contact information so we can get in touch with
             you regarding appointments & health concerns.

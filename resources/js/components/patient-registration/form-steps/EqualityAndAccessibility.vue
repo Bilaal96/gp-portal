@@ -40,8 +40,6 @@ useDebugForm(props.form, {
 </script>
 <template>
     <div :id="props.id">
-        <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
-
         <!-- Wrapper around all inputs -->
         <div class="space-y-4">
             <!-- Ethnic Background

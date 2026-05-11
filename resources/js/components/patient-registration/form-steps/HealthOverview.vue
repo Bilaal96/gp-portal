@@ -220,8 +220,6 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
 
 <template>
     <div :id="props.id">
-        <h1 class="mb-2 text-2xl font-bold">{{ props.title }}</h1>
-
         <!-- All Questions -->
         <div class="space-y-4">
             <!-- RadioGroup (binary) - Do you have any long-term medical conditions? -->

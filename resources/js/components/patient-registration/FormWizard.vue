@@ -30,10 +30,6 @@ watchEffect(() => {
 
 <template>
     <div class="patient-registration">
-        <p class="lg:text-red-600">
-            Step: {{ stepper.stepNumber.value }} / {{ formSteps.length }}
-        </p>
-
         <form @submit="form.handleSubmit()">
             <!-- 
                 - Can pass additional props - they will merge 
