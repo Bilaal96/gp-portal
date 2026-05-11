@@ -40,6 +40,11 @@ useDebugForm(props.form, {
 </script>
 <template>
     <div :id="props.id">
+        <p class="mb-4">
+            Everyone is valued. Help us to ensure that you get the best
+            healthcare no matter where you're from or what your background is.
+        </p>
+
         <!-- Wrapper around all inputs -->
         <div class="space-y-4">
             <!-- Ethnic Background

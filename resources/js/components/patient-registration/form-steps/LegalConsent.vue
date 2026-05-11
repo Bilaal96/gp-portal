@@ -28,6 +28,18 @@ useDebugForm(props.form, { formStep: 'legalConsent', label: props.title });
 </script>
 <template>
     <div :class="props.id">
+        <ul class="mb-4 list-disc *:ml-6 *:text-sm">
+            The necessary legal stuff. Please confirm the following:
+            <li>how you'd like us to contact you;</li>
+            <li>
+                whether you'd like to opt-in to data sharing (for your direct
+                and/or indirect benefit);
+            </li>
+            <li>
+                that all the information you have provided is accurate & true.
+            </li>
+        </ul>
+
         <div class="space-y-4">
             <!-- RadioGroup (binary) - Do you consent to us contacting you by SMS/email? -->
             <form.Field

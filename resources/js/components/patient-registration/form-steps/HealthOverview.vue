@@ -220,6 +220,11 @@ useDebugForm(props.form, { formStep: 'healthOverview', label: props.title });
 
 <template>
     <div :id="props.id">
+        <p class="mb-4">
+            Everyone is unique. Help us to build an accurate patient profile
+            that aids in tailoring our medical care to you as an individual.
+        </p>
+
         <!-- All Questions -->
         <div class="space-y-4">
             <!-- RadioGroup (binary) - Do you have any long-term medical conditions? -->

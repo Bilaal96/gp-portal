@@ -40,9 +40,7 @@ useDebugForm(props.form, { formStep: 'identity', label: props.title });
 <template>
     <div :id="props.id">
         <p class="mb-4">
-            Before we begin, we must confirm if you are applying for yourself or
-            on behalf of someone else. Please answer the following questions to
-            proceed with the registration process.
+            Please provide the following information to confirm your identity.
         </p>
 
         <!-- All Questions -->

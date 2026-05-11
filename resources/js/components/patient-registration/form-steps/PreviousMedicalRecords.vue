@@ -20,9 +20,9 @@ useDebugForm(props.form, {
 <template>
     <div :id="props.id">
         <p class="mb-4">
-            Before we begin, we must confirm if you are applying for yourself or
-            on behalf of someone else. Please answer the following questions to
-            proceed with the registration process.
+            Providing the following information allows us to quickly &
+            accurately locate your medical records, so that we can support you
+            with the best healthcare possible.
         </p>
 
         <!-- All Questions -->
