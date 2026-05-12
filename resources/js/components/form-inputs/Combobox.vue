@@ -1,0 +1,265 @@
+<script setup lang="ts">
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-vue-next';
+import { computed, ref, useSlots } from 'vue';
+import { Button } from '@/components/ui/button';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+
+interface LabelledOption {
+    label: string;
+    value: string;
+}
+
+type Option = string | LabelledOption;
+type GroupedOptions = Record<string, Option[]>;
+type OptionsProp = Option[] | GroupedOptions;
+
+defineOptions({ inheritAttrs: false });
+
+const props = defineProps<{
+    label?: string; // user instruction
+    prompt?: string; // shown in trigger
+    placeholder?: string; // filter input placeholder
+    emptyPrompt?: string; // shown when no filtered results
+    popoverContentStyles?: string;
+    options: OptionsProp;
+    selected: string[] | string; // enables multiselect if array is provided
+}>();
+const emit = defineEmits(['update:selected']);
+
+const slots = useSlots();
+
+const open = ref(false);
+
+function isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Takes `(string | LabelledOption)[]` & returns `LabelledOption[]`.
+ * This structure is required by this component to render selectable items.
+ */
+function normaliseOptionsArray(options: Option[]): LabelledOption[] {
+    return options.map((option) => {
+        if (typeof option === 'string') {
+            return { label: option, value: option };
+        }
+        return option;
+    });
+}
+
+/**
+ * Array of render-able options for the input.
+ * Computed when `selectedOptions` is an `array`.
+ */
+const ungroupedOptions = computed(() => {
+    if (!Array.isArray(props.options)) return null;
+
+    return normaliseOptionsArray(props.options);
+});
+
+/**
+ * Object containing render-able options for the input.
+ * Option arrays are grouped under object keys.
+ * Computed when `selectedOptions` is an `object`.
+ */
+const groupedOptions = computed(() => {
+    if (!isObject(props.options)) return null;
+
+    const normalisedOptions: Record<string, LabelledOption[]> = {};
+
+    for (const groupName in props.options) {
+        const groupValues = props.options[groupName];
+
+        normalisedOptions[groupName] = normaliseOptionsArray(groupValues);
+    }
+
+    return normalisedOptions;
+});
+
+function closeCommandList() {
+    open.value = false;
+}
+
+function handleOptionSelect(option: LabelledOption) {
+    emit('update:selected', option.value);
+
+    // Keep multiselect combobox open on selection
+    if (!Array.isArray(props.selected)) {
+        closeCommandList();
+    }
+}
+
+/**
+ * Determine if an option (in props.options) is selected
+ */
+function isSelected(optionValue: string): boolean {
+    if (Array.isArray(props.selected)) {
+        return props.selected.includes(optionValue);
+    }
+
+    return props.selected === optionValue;
+}
+
+function renderTriggerText() {
+    const defaultTriggerText = props.prompt ?? 'Select item...';
+    return Array.isArray(props.selected)
+        ? defaultTriggerText
+        : // selected is initially an empty string, provide fallback prompt
+          props.selected || defaultTriggerText;
+}
+
+const getCommandItemStyles = (optionValue: string) => {
+    return cn(
+        // Global base (inc. hover styles)
+        'transition-all hover:cursor-pointer hover:bg-primary/10',
+
+        // Focused input / keyboard navigation
+        'data-[highlighted]:bg-primary/20 data-[highlighted]:font-semibold data-[highlighted]:text-black hover:data-[highlighted]:bg-primary/10',
+
+        // Selected item
+        isSelected(optionValue) ? 'bg-primary/40 text-accent-foreground' : '',
+    );
+};
+
+const getCheckIconStyles = (optionValue: string) => {
+    return cn(
+        'mr-2 h-4 w-4 text-accent-foreground transition-all',
+
+        // show / hide check icon
+        isSelected(optionValue) ? 'opacity-100' : 'opacity-0',
+    );
+};
+</script>
+
+<template>
+    <div>
+        <!-- Label -->
+        <p v-if="label" class="mb-2 ml-1 text-sm font-bold">
+            {{ label }}
+        </p>
+
+        <!-- Subtext -->
+        <div v-if="slots.subtext" class="mb-3 ml-1 text-xs">
+            <slot name="subtext" />
+        </div>
+
+        <!-- Combobox -->
+        <Popover v-model:open="open">
+            <PopoverTrigger as-child>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    :aria-expanded="open"
+                    :class="
+                        cn(
+                            'justify-between hover:cursor-pointer hover:bg-primary/40',
+                        )
+                    "
+                    v-bind="$attrs"
+                >
+                    <span
+                        :class="
+                            cn('text-muted-foreground', {
+                                // Single select Combobox only
+                                'text-accent-foreground':
+                                    !Array.isArray(props.selected) &&
+                                    props.selected !== '',
+                            })
+                        "
+                    >
+                        {{ renderTriggerText() }}
+                    </span>
+                    <ChevronsUpDownIcon
+                        class="ml-2 h-4 w-4 shrink-0 opacity-50"
+                    />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent
+                :class="cn('p-0', popoverContentStyles)"
+                align="start"
+            >
+                <Command>
+                    <CommandInput :placeholder="placeholder ?? 'Search'">
+                        <!-- Slot reserved for action button -->
+                        <template #action="slotProps">
+                            <slot
+                                name="action"
+                                v-bind="slotProps"
+                                :close-combobox="closeCommandList"
+                            />
+                        </template>
+                    </CommandInput>
+
+                    <CommandList>
+                        <CommandEmpty>{{
+                            emptyPrompt ?? 'No matches found.'
+                        }}</CommandEmpty>
+
+                        <!-- Render simple `LabelledOptions[]` -->
+                        <template v-if="ungroupedOptions">
+                            <CommandGroup class="space-y-0.5">
+                                <CommandItem
+                                    v-for="option in ungroupedOptions"
+                                    :key="option.value"
+                                    :value="option.value"
+                                    @select="handleOptionSelect(option)"
+                                    :class="getCommandItemStyles(option.value)"
+                                >
+                                    <CheckIcon
+                                        :class="
+                                            getCheckIconStyles(option.value)
+                                        "
+                                    />
+                                    {{ option.label }}
+                                </CommandItem>
+                            </CommandGroup>
+                        </template>
+
+                        <!-- Render grouped `LabelledOptions[]` -->
+                        <template v-if="groupedOptions">
+                            <template
+                                v-for="(options, groupName) in groupedOptions"
+                                :key="groupName"
+                            >
+                                <CommandGroup
+                                    class="space-y-0.5"
+                                    :heading="groupName"
+                                >
+                                    <CommandItem
+                                        v-for="option in options"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        @select="handleOptionSelect(option)"
+                                        :class="
+                                            getCommandItemStyles(option.value)
+                                        "
+                                    >
+                                        <CheckIcon
+                                            :class="
+                                                getCheckIconStyles(option.value)
+                                            "
+                                        />
+                                        {{ option.label }}
+                                    </CommandItem>
+                                </CommandGroup>
+                            </template>
+                        </template>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    </div>
+</template>
