@@ -21,11 +21,22 @@ const hasFixedAddress = props.form.useStore(
 
 // REVIEW: validate fields on submit instead of clearing then when hasFixedAddress is false
 watch(hasFixedAddress, (state) => {
-    if (!state) {
-        props.form.setFieldValue('contact.address1', '');
-        props.form.setFieldValue('contact.address2', '');
-        props.form.setFieldValue('contact.city', '');
-        props.form.setFieldValue('contact.postCode', '');
+    switch (state) {
+        case false:
+            // No fixed address - set to clinic's address
+            props.form.setFieldValue('contact.address1', '121 Withington Rd');
+            props.form.setFieldValue('contact.address2', 'Whalley Range');
+            props.form.setFieldValue('contact.city', 'Manchester');
+            props.form.setFieldValue('contact.postCode', 'M16 8EE');
+            break;
+        case true:
+        case null:
+            // Ensure fields are emptied before user provides input
+            props.form.resetField('contact.address1');
+            props.form.resetField('contact.address2');
+            props.form.resetField('contact.city');
+            props.form.resetField('contact.postCode');
+            break;
     }
 });
 
@@ -42,22 +53,24 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
 
         <div class="space-y-4">
             <!-- Address -->
-            <!-- No fixed address - checkbox 
-            * legal requirement for the homeless - cannot refuse registration if applicant does not have fixed address
+            <!-- RadioGroup (binary) - No fixed address 
+                * legal requirement for the homeless - cannot refuse registration if applicant does not have fixed address
 
-            * unchecked (default) - shows Fixed Address inputs (see below)
-            * checked 
-                - hides fixed address input
-                - use clinic address as temporary address
-        -->
+                * yes 
+                    - show Fixed Address inputs (see below)
+                * no 
+                    - hides Fixed Address inputs
+                    - use clinic address as temporary address
+            -->
             <form.Field name="contact.hasFixedAddress" v-slot="{ field }">
                 <RadioGroup
                     id="has-fixed-address"
                     prompt="Do you have a fixed address?"
                     :options="binaryRadioGroup()"
                     @change="
-                        (value) =>
-                            field.handleChange(value === 'yes' ? true : false)
+                        (value) => {
+                            field.handleChange(value === 'yes' ? true : false);
+                        }
                     "
                 >
                     <template #subtext>
@@ -76,7 +89,11 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
                     Please enter your address:
                 </p>
                 <!-- First line -->
-                <form.Field name="contact.address1" v-slot="{ field }">
+                <form.Field
+                    name="contact.address1"
+                    v-slot="{ field }"
+                    :preserve-value="true"
+                >
                     <Input
                         class="max-w-sm"
                         placeholder="Address Line 1"
@@ -87,7 +104,11 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
                 </form.Field>
 
                 <!-- Second line (optional) -->
-                <form.Field name="contact.address2" v-slot="{ field }">
+                <form.Field
+                    name="contact.address2"
+                    v-slot="{ field }"
+                    :preserve-value="true"
+                >
                     <Input
                         class="max-w-sm"
                         placeholder="Address Line 2"
@@ -97,7 +118,11 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
                 </form.Field>
 
                 <!-- City -->
-                <form.Field name="contact.city" v-slot="{ field }">
+                <form.Field
+                    name="contact.city"
+                    v-slot="{ field }"
+                    :preserve-value="true"
+                >
                     <Input
                         class="max-w-sm"
                         placeholder="City"
@@ -108,7 +133,11 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
                 </form.Field>
 
                 <!-- Post Code -->
-                <form.Field name="contact.postCode" v-slot="{ field }">
+                <form.Field
+                    name="contact.postCode"
+                    v-slot="{ field }"
+                    :preserve-value="true"
+                >
                     <Input
                         class="max-w-sm"
                         placeholder="Post Code"

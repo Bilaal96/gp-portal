@@ -1,9 +1,20 @@
+// Used to enforce types on the Patient Registration Form's `defaultValues` tanstack form option.
 import {
     type usePatientRegistrationForm,
     type defaultValues,
 } from '@/components/patient-registration/form/utils';
 
-export type ContactMethod = 'phone' | 'sms' | 'email' | 'letter';
+/* --------------------------------- General -------------------------------- */
+export type PatientRegistrationFormValues = typeof defaultValues;
+
+export type PatientRegistrationForm = ReturnType<
+    typeof usePatientRegistrationForm
+>;
+
+/** Required boolean field - validate by checking field value is NOT null */
+export type BooleanField = boolean | null;
+/** Optional boolean field - undefined values are permissible as they are omitted from tanstack form state on submission */
+export type OptionalBooleanField = boolean | undefined;
 
 export interface TDate<T = number | null> {
     day: T;
@@ -11,77 +22,38 @@ export interface TDate<T = number | null> {
     year: T;
 }
 
-/* ----------------------------- Composed types ----------------------------- */
-/**
- * Used to enforce types on the Patient Registration Form's `defaultValues` tanstack form option.
- * Primitive types do not need to be listed as they can easily be inferred.
- *
- * __NOTE:__
- * (1) A field is only optional if it's explicitly suffixed with `?`.
- * (2) If a union type explicitly contains `undefined`, the corresponding field is required & its default value is `undefined`.
- * (3) For required fields, you can check for `undefined` to ensure that the user has provided input.
- */
-export interface FormTypes {
-    personal: {
-        dateOfBirth: TDate;
-        sexAtBirth: 'male' | 'female' | 'undisclosed';
-        isPregnant?: boolean;
-        genderIdentity:
-            | 'male'
-            | 'female'
-            | 'non-binary'
-            | 'other'
-            | 'undisclosed';
-        meetsUkResidencyDuration: boolean | undefined;
-    };
-    contact: {
-        hasFixedAddress: boolean | undefined;
-        preferredContactMethods: ContactMethod[];
-    };
-    identity: {
-        ukFirstArrivalDate: TDate;
-    };
-    previousMedicalRecords: {
-        previousGP: {
-            departureDate: TDate;
-        };
-        shouldRequestMedicalRecords: boolean | undefined;
-        hasServedInArmedForces: boolean | undefined;
-        isVeteran: boolean | undefined;
-    };
-    healthOverview: {
-        longTermConditions: string[];
-        majorIncidents: { title: string; reason: string; details: string }[];
-        isUnderSpecialistCare: boolean | undefined;
-        medication: { name: string; dosage: string; purpose: string }[];
-        height: number;
-        weight: number;
-        exerciseFrequency: boolean | undefined;
-        smokingHistory: string;
-        alcoholConsumption: {
-            frequency: string;
-            quantity: string;
-            bingeFrequency: string;
-        };
-        usesRecreationalDrugs: boolean | undefined;
-    };
-    equalityAndAccessibility: {
-        ethnicity: string;
-        religiousBackground: string;
-        requiresAidAndSupport: boolean | undefined;
-        requiredAidAndSupport: string[];
-        preferredLanguage: string;
-        requiresInterpreter: boolean | undefined;
-    };
-    legalConsent: {
-        canContactViaSmsOrEmail: boolean | undefined;
-        dataSharing: string[];
-        digitalSignature: string;
-    };
+/* ------------------------------ Step-specific ----------------------------- */
+// 1. Personal Details
+export type GenderIdentity =
+    | 'male'
+    | 'female'
+    | 'non-binary'
+    | 'other'
+    | 'undisclosed';
+
+export type SexAtBirth = 'male' | 'female' | 'undisclosed';
+
+// 2. Contact
+export type ContactMethod = 'phone' | 'sms' | 'email' | 'letter';
+
+// 3. Identity
+
+// 4. Previous Medical Records
+
+// 5. Health Overview
+export interface MajorIncident {
+    title: string;
+    reason: string;
+    details: string;
 }
 
-export type PatientRegistrationFormValues = typeof defaultValues;
+export interface Medication {
+    name: string;
+    dosage: string;
+    purpose: string;
+}
 
-export type PatientRegistrationForm = ReturnType<
-    typeof usePatientRegistrationForm
->;
+// 6. Equality And Accessibility
+
+// 7. Declaration of Legal Consent
+export type DataSharingOption = 'Direct Care' | 'NHS Planning';

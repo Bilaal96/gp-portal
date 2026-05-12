@@ -3,10 +3,7 @@ import { MinusCircleIcon, PlusCircleIcon } from 'lucide-vue-next';
 import { reactive, ref } from 'vue';
 import BadgeList from '@/components/BadgeList.vue';
 import { Combobox, Input, RadioGroup } from '@/components/form-inputs';
-import {
-    binaryRadioGroup,
-    getBinaryRadioGroupDefaultValue,
-} from '@/components/form-inputs/radio-group/utils';
+import { binaryRadioGroup } from '@/components/form-inputs/radio-group/utils';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
 import type { FormStepProps } from '@/components/patient-registration/form-steps';
 import { Button } from '@/components/ui/button';
@@ -171,15 +168,14 @@ useDebugForm(props.form, {
                     id="required-aid-and-support"
                     prompt="Do you need any accessibility support for your appointments?"
                     :options="binaryRadioGroup()"
-                    :default-value="getBinaryRadioGroupDefaultValue(field)"
                     @change="
                         (value) => {
                             // Clear previously specified required support
-                            if (value === 'no')
-                                props.form.setFieldValue(
+                            if (value === 'no') {
+                                props.form.resetField(
                                     'equalityAndAccessibility.requiredAidAndSupport',
-                                    [],
                                 );
+                            }
 
                             field.handleChange(value === 'yes' ? true : false);
                         }
@@ -323,7 +319,6 @@ useDebugForm(props.form, {
                     id="required-aid-and-support"
                     prompt="Do you need a language interpreter?"
                     :options="binaryRadioGroup()"
-                    :default-value="getBinaryRadioGroupDefaultValue(field)"
                     @change="
                         (value) =>
                             field.handleChange(value === 'yes' ? true : false)

@@ -1,5 +1,15 @@
 import { useForm } from '@tanstack/vue-form';
-import type { FormTypes } from '@/components/patient-registration/form/types';
+import type {
+    BooleanField,
+    ContactMethod,
+    DataSharingOption,
+    GenderIdentity,
+    MajorIncident,
+    Medication,
+    OptionalBooleanField,
+    SexAtBirth,
+    TDate,
+} from '@/components/patient-registration/form/types';
 
 const DEFAULT_DATE = {
     day: null,
@@ -22,38 +32,34 @@ export const defaultValues = {
     },
     personal: {
         firstName: '',
-        middleNames: '', // optional
+        middleNames: '', // [optional]
         lastName: '',
-        previousNames: '', // optional
-
+        previousNames: '', // [optional]
         accountEmail: '',
 
-        // date of birth - custom input
-        dateOfBirth: {
-            ...DEFAULT_DATE,
-        } as FormTypes['personal']['dateOfBirth'],
+        // custom input: form-inputs/DateInput.vue
+        dateOfBirth: { ...DEFAULT_DATE } as TDate,
 
         // radio - (include "prefer not to say" option)
-        sexAtBirth: '' as FormTypes['personal']['sexAtBirth'],
-        // ? dependency: input shown if sexAtBirth === 'female'
-        // radio: boolean | undefined (unanswered)
-        isPregnant: undefined as FormTypes['personal']['isPregnant'],
-
-        // radio - (include "prefer not to say" option)
-        genderIdentity: '' as FormTypes['personal']['genderIdentity'],
-        // ? dependency: input shown if genderIdentity === 'other'
+        genderIdentity: '' as GenderIdentity,
+        // ? conditionally rendered when: genderIdentity === 'other'
         // input:text - user may specify another gender identity
         genderIdentityOther: '',
 
-        // Optional, radio: boolean | undefined (unanswered)
-        meetsUkResidencyDuration:
-            undefined as FormTypes['personal']['meetsUkResidencyDuration'],
+        // radio - (include "prefer not to say" option)
+        sexAtBirth: '' as SexAtBirth,
+        // ? conditionally rendered when: sexAtBirth === 'female'
+        // [optional] radio
+        isPregnant: undefined as OptionalBooleanField,
 
-        // checkbox
+        // [optional] radio (binary)
+        meetsUkResidencyDuration: undefined as OptionalBooleanField,
+
+        // Required to check the checkbox to proceed
         acknowledgedApplicationProcessDuration: false,
     },
     contact: {
-        hasFixedAddress: undefined as FormTypes['contact']['hasFixedAddress'],
+        hasFixedAddress: null as BooleanField,
         address1: '',
         address2: '',
         city: '',
@@ -61,18 +67,17 @@ export const defaultValues = {
         primaryPhone: '',
         secondaryPhone: '',
         email: '',
-        preferredContactMethods:
-            [] as FormTypes['contact']['preferredContactMethods'],
+        preferredContactMethods: [] as ContactMethod[],
     },
     identity: {
         nhsNumber: '',
         nationalInsuranceNumber: '',
 
         countryOfBirth: '',
-        // ? dependency: render if country of birth is not UK
+        // ? conditionally rendered when: country of birth is not UK
         ukFirstArrivalDate: {
             ...DEFAULT_DATE,
-        } as FormTypes['identity']['ukFirstArrivalDate'],
+        } as TDate,
     },
     previousMedicalRecords: {
         previousGP: {
@@ -83,51 +88,42 @@ export const defaultValues = {
             postCode: '',
             departureDate: {
                 ...DEFAULT_DATE,
-            } as FormTypes['previousMedicalRecords']['previousGP']['departureDate'],
+            } as TDate,
         },
-        shouldRequestMedicalRecords:
-            undefined as FormTypes['previousMedicalRecords']['shouldRequestMedicalRecords'],
-        hasServedInArmedForces:
-            undefined as FormTypes['previousMedicalRecords']['hasServedInArmedForces'],
-        isVeteran:
-            undefined as FormTypes['previousMedicalRecords']['isVeteran'],
+        shouldRequestMedicalRecords: undefined as OptionalBooleanField,
+        hasServedInArmedForces: undefined as OptionalBooleanField,
+        isVeteran: undefined as OptionalBooleanField,
     },
     healthOverview: {
-        longTermConditions:
-            [] as FormTypes['healthOverview']['longTermConditions'],
-        majorIncidents: [] as FormTypes['healthOverview']['majorIncidents'],
-        isUnderSpecialistCare:
-            undefined as FormTypes['healthOverview']['isUnderSpecialistCare'],
-        medication: [] as FormTypes['healthOverview']['medication'],
+        longTermConditions: [] as string[],
+        majorIncidents: [] as MajorIncident[],
+        isUnderSpecialistCare: undefined as OptionalBooleanField,
+        medication: [] as Medication[],
         height: 0,
         weight: 0,
-        exerciseFrequency:
-            undefined as FormTypes['healthOverview']['exerciseFrequency'],
+        exerciseFrequency: '',
         smokingHistory: '',
         alcoholConsumption: {
             frequency: '',
             quantity: '',
             bingeFrequency: '',
         },
-        usesRecreationalDrugs:
-            undefined as FormTypes['healthOverview']['usesRecreationalDrugs'],
+        usesRecreationalDrugs: undefined as OptionalBooleanField,
     },
     equalityAndAccessibility: {
         ethnicity: '',
         religiousBackground: '',
-        requiresAidAndSupport:
-            undefined as FormTypes['equalityAndAccessibility']['requiresAidAndSupport'],
-        requiredAidAndSupport:
-            [] as FormTypes['equalityAndAccessibility']['requiredAidAndSupport'],
+
+        requiresAidAndSupport: null as BooleanField,
+        requiredAidAndSupport: [] as string[],
+
         preferredLanguage: '',
-        requiresInterpreter:
-            undefined as FormTypes['equalityAndAccessibility']['requiresInterpreter'],
+        requiresInterpreter: undefined as OptionalBooleanField,
     },
     legalConsent: {
-        canContactViaSmsOrEmail:
-            undefined as FormTypes['legalConsent']['canContactViaSmsOrEmail'],
-        dataSharing: [] as FormTypes['legalConsent']['dataSharing'],
-        digitalSignature: '' as FormTypes['legalConsent']['digitalSignature'],
+        canContactViaSmsOrEmail: null as BooleanField,
+        dataSharing: [] as DataSharingOption[],
+        digitalSignature: '',
     },
 };
 

@@ -4,13 +4,18 @@ import Checkbox from '@/components/form-inputs/Checkbox.vue';
 import RadioGroup from '@/components/form-inputs/radio-group/RadioGroup.vue';
 import { binaryRadioGroup } from '@/components/form-inputs/radio-group/utils';
 import { getTextFieldProps } from '@/components/form-inputs/utils';
+import type { DataSharingOption } from '@/components/patient-registration/form/types';
 import type { FormStepProps } from '@/components/patient-registration/form-steps';
 import { Separator } from '@/components/ui/separator';
 import { useDebugForm } from '@/composables/useDebugForm';
 
 const props = defineProps<FormStepProps>();
 
-const DATA_SHARING_OPTIONS = [
+const DATA_SHARING_OPTIONS: {
+    id: string;
+    label: string;
+    value: DataSharingOption;
+}[] = [
     {
         id: 'direct-care',
         label: 'I consent to the use of my data for Direct Care',
