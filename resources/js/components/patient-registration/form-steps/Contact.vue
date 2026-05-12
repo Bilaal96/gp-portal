@@ -194,7 +194,7 @@ useDebugForm(props.form, { formStep: 'contact', label: props.title });
                         "
                         @change="
                             (checked) => {
-                                const preferredContactMethods =
+                                const preferredContactMethods: ContactMethod[] =
                                     field.state.value;
 
                                 if (checked) {
