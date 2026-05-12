@@ -25,7 +25,7 @@ const breakpoints = useBreakpoints(breakpointsTailwind);
 <template>
     <!-- Equivalent to: <AppSidebar /> -->
     <Sidebar
-        class="overflow-hidden border md:max-h-max md:rounded md:border-muted-foreground"
+        class="overflow-hidden border md:sticky md:top-2 md:max-h-max md:self-start md:rounded md:border-muted-foreground"
         :collapsible="breakpoints.md.value ? 'none' : 'offcanvas'"
         variant="inset"
     >
